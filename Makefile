@@ -6,4 +6,4 @@ build:
 	env GOOS=linux GOARCH=arm64 go build -o bin/shagent
 
 deploy:
-	scp ./bin/shagent dima@172.20.10.2:/home/dima/go/src/shagent
+	scp -P 47210 ./bin/shagent dima@pitunnel.com:/home/dima/go/src/shagent/bin
