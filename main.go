@@ -3,9 +3,14 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	//"os"
+	//"syscall"
 	"time"
 
+	//"bitbucket.org/gmcbay/i2c"
 	"github.com/3rubasa/shagent/controllers/light"
+	"github.com/3rubasa/shagent/controllers/watchdog"
 	"github.com/3rubasa/shagent/sensors/power"
 	"github.com/3rubasa/shagent/sensors/temperature"
 )
@@ -31,6 +36,10 @@ const sampleInterval = time.Second * 60
 // }
 
 func main() {
+	wd := watchdog.New()
+	wd.Initialize()
+	wd.Start()
+
 	l := light.New()
 	err := l.Initialize()
 	if err != nil {
