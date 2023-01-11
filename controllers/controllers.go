@@ -5,3 +5,9 @@ type LightController interface {
 	Start() error
 	Stop()
 }
+
+type Watchdog interface {
+	Initialize() error
+	Start() error
+	Stop()
+}

@@ -1,3 +1,5 @@
+bitbucket.org/gmcbay/i2c v0.0.0-20130111033438-1235f1776ee7 h1:tI4wHghrtS99oeFYK9ttoyro7i9UBXarUaH+VT/xgYE=
+bitbucket.org/gmcbay/i2c v0.0.0-20130111033438-1235f1776ee7/go.mod h1:y8VEJIOQsxe20Pk6RtVeeRl4DkVq+lfRROrQCF+ApZU=
 github.com/3rubasa/go-dht v1.0.1 h1:tJK6+sXwNv2RjhE1yvZtB3xaUMpHzCvwNnz7IRm4GvA=
 github.com/3rubasa/go-dht v1.0.1/go.mod h1:tMrP/Edgiw0kzUNJxM05K43r5wkHHxFpa3dPX2VZQvg=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
@@ -69,6 +71,8 @@ github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/suapapa/go_eddystone v1.3.1/go.mod h1:bXC11TfJOS+3g3q/Uzd7FKd5g62STQEfeEIhcKe4Qy8=
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
 github.com/veandco/go-sdl2 v0.3.3/go.mod h1:FB+kTpX9YTE+urhYiClnRzpOXbiWgaU3+5F2AB78DPg=
+github.com/waltzofpearls/go-servo-picobber v0.0.0-20160515022420-5295f680804e h1:qiTaeAwfWBnauqtAUoAA6RU06hOt1GnNjhaP9J05hSk=
+github.com/waltzofpearls/go-servo-picobber v0.0.0-20160515022420-5295f680804e/go.mod h1:q7pqUujPoz+P16U/HdieVNBHZgkG0Ra4CKAGgcuFgic=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 go.bug.st/serial v1.1.1/go.mod h1:VmYBeyJWp5BnJ0tw2NUJHZdJTGl2ecBGABHlzRK1knY=
 gobot.io/x/gobot v1.16.0 h1:MQN0c5iPYBkChpPPY/zM6Au0rihJZ4QmK98kn1DKBKQ=
