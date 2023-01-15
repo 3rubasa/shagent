@@ -1,0 +1,23 @@
+1. Hardware
+  a. Connect micro USB connector to "USB" port on SIM7600 HAT (not "USB to UART"!)
+  b. Connect USB cable from SIM7600 to Raspbery pi USB port
+
+2. Pi config
+  a. > sudo raspi-config
+  b. Interface Options -> Serial Port -> Yes (Yes to all asked questions) -> Finish
+  c. Reboot if requested
+
+3. Install minicom Tool
+  a. > sudo apt install minicom
+
+4. Open serial port connection to SIM7600 with minicom
+   a. > sudo minicom -D /dev/ttyUSB2   # I don't know why USB2, but it works
+
+- Current balance:          AT+CUSD=1,"*111#",15
+- Current Internet Balance: AT+CUSD=1,"*121#",15
+- Curret tariff:            AT+CUSD=1,"*161#",15
+- My phone number:            AT+CUSD=1,"*161#",15
+
+- Delete all sms messages: AT+CMGD=1,4
+
+for more commands: https://www.developershome.com/sms/cmgdCommand.asp
