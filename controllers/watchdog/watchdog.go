@@ -56,11 +56,11 @@ func (p *watchdog) Stop() {
 }
 
 func InternetIsAvailable() bool {
-	fmt.Printf("About to send request to check if Internet is available: %s", url)
+	fmt.Printf("About to send request to check if Internet is available: %s \n", url)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		fmt.Printf("Error while creating request: %s", err.Error())
+		fmt.Printf("Error while creating request: %s \n", err.Error())
 		return false
 	}
 
@@ -70,13 +70,13 @@ func InternetIsAvailable() bool {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Printf("Error while sending request: %s", err.Error())
+		fmt.Printf("Error while sending request: %s \n", err.Error())
 		return false
 	}
 
 	if resp.StatusCode >= 400 {
 		err = fmt.Errorf("response status is >= 400: %d", resp.StatusCode)
-		fmt.Printf("Error: %s", err.Error())
+		fmt.Printf("Error: %s \n", err.Error())
 		return false
 	}
 
@@ -92,7 +92,7 @@ func (p *watchdog) TestInternetConnection() {
 	}
 
 	if p.errCount >= 3 {
-		fmt.Printf("Internet is not available for the 3rd time in a row, issuing reboot command")
+		fmt.Printf("Internet is not available for the 3rd time in a row, issuing reboot command \n")
 		syscall.Reboot(syscall.LINUX_REBOOT_CMD_RESTART)
 	}
 }

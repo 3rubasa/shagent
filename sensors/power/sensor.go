@@ -26,7 +26,7 @@ func New() sensors.PowerStatusProvider {
 func (p *powerStatusProvider) Initialize() error {
 	err := rpio.Open()
 	if err != nil {
-		fmt.Printf("Failed to open rpio: %s", err.Error())
+		fmt.Printf("Failed to open rpio: %s \n", err.Error())
 		return err
 	}
 

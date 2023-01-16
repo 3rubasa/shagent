@@ -27,12 +27,12 @@ func New() sensors.TemperatureProvider {
 func (p *temperatureProvider) Initialize() error {
 	err := dht.HostInit()
 	if err != nil {
-		fmt.Printf("Error in HostInit(): %s", err.Error())
+		fmt.Printf("Error in HostInit(): %s \n", err.Error())
 	}
 
 	p.sensor, err = dht.NewDHT(DefaultGPIOPin, dht.Celsius, "dht22")
 	if err != nil {
-		fmt.Printf("Error in NewDHT(): %s", err.Error())
+		fmt.Printf("Error in NewDHT(): %s \n", err.Error())
 	}
 
 	return nil
@@ -41,7 +41,7 @@ func (p *temperatureProvider) Initialize() error {
 func (p *temperatureProvider) GetTemperature() (float64, error) {
 	_, t, err := p.sensor.ReadRetry(maxRetries)
 	if err != nil {
-		fmt.Printf("Error while reading a sample: %s", err.Error())
+		fmt.Printf("Error while reading a sample: %s \n", err.Error())
 	}
 
 	return t, nil

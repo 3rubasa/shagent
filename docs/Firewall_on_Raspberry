@@ -1,0 +1,6 @@
+To open any port type in terminal:
+
+sudo ufw open [PORT]  # where [PORT] is a TCP port to open
+
+e.g.
+sudo ufw open 8888   # this will open port 8888

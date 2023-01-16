@@ -13,6 +13,7 @@ import (
 	"github.com/3rubasa/shagent/controllers/watchdog"
 	"github.com/3rubasa/shagent/sensors/power"
 	"github.com/3rubasa/shagent/sensors/temperature"
+	"github.com/3rubasa/shagent/webserver"
 )
 
 const sampleInterval = time.Second * 60
@@ -40,8 +41,20 @@ func main() {
 	wd.Initialize()
 	wd.Start()
 
+	ws := webserver.New()
+	err := ws.Initialize()
+	if err != nil {
+		fmt.Println("Failed to initialize the web server: ", err)
+		return
+	}
+	err = ws.Start()
+	if err != nil {
+		fmt.Println("Failed to start the web server: ", err)
+		return
+	}
+
 	l := light.New()
-	err := l.Initialize()
+	err = l.Initialize()
 	if err != nil {
 		fmt.Println("Failed to initialize light controller: ", err)
 		return
@@ -95,11 +108,11 @@ func main() {
 func SendMeasurements(t float64, p int) error {
 	//bodyReader := bytes.NewReader([]byte(body))
 	url := fmt.Sprintf("https://api.thingspeak.com/update?api_key=TL9W7QIEFKFIYIS7&field1=%f&field2=%d", t, p)
-	fmt.Printf("About to send request: %s", url)
+	fmt.Printf("About to send request: %s \n", url)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		fmt.Printf("Error while creating request: %s", err.Error())
+		fmt.Printf("Error while creating request: %s \n", err.Error())
 		return err
 	}
 
@@ -109,13 +122,13 @@ func SendMeasurements(t float64, p int) error {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Printf("Error while sending request: %s", err.Error())
+		fmt.Printf("Error while sending request: %s \n", err.Error())
 		return err
 	}
 
 	if resp.StatusCode != 200 {
 		err = fmt.Errorf("response status is not 200: %d", resp.StatusCode)
-		fmt.Printf("Error: %s", err.Error())
+		fmt.Printf("Error: %s \n", err.Error())
 		return fmt.Errorf("response status is not 200: %d", resp.StatusCode)
 	}
 
