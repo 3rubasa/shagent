@@ -5,8 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/3rubasa/shagent/controllers"
+
+	"github.com/sitec-systems/gmodem"
 )
 
 type WebServer interface {
@@ -78,6 +81,114 @@ func (w *webServer) Initialize() error {
 			fmt.Println("Failed to turn relay off: ", err)
 			response.Error = err.Error()
 		}
+
+		json.NewEncoder(rw).Encode(response)
+	})
+
+	w.mux.HandleFunc("/info/cellular/balance", func(rw http.ResponseWriter, r *http.Request) {
+		type Response struct {
+			Error   string `json:"error"`
+			Balance string `json:"balance"`
+		}
+		response := &Response{}
+
+		mdm := &gmodem.Modem{
+			DevFile:     "/dev/ttyUSB2",
+			ReadTimeout: 20 * time.Second,
+		}
+
+		err := mdm.Open()
+		if err != nil {
+			errMsg := fmt.Sprintln("Failed to open Serial device: ", err.Error())
+			fmt.Println(errMsg)
+			response.Error = errMsg
+			json.NewEncoder(rw).Encode(response)
+			return
+		}
+
+		str, err := mdm.SendAt(`AT+CUSD=1,"*111#",15`)
+		if err != nil {
+			errMsg := fmt.Sprintln("Failed to send AT command: ", err)
+			fmt.Println(errMsg)
+			response.Error = errMsg
+			json.NewEncoder(rw).Encode(response)
+			return
+		}
+
+		fmt.Println("Cellular Balance: ", str)
+		response.Balance = str
+
+		json.NewEncoder(rw).Encode(response)
+	})
+
+	w.mux.HandleFunc("/info/cellular/internet", func(rw http.ResponseWriter, r *http.Request) {
+		type Response struct {
+			Error   string `json:"error"`
+			Balance string `json:"balance"`
+		}
+		response := &Response{}
+
+		mdm := &gmodem.Modem{
+			DevFile:     "/dev/ttyUSB2",
+			ReadTimeout: 20 * time.Second,
+		}
+
+		err := mdm.Open()
+		if err != nil {
+			errMsg := fmt.Sprintln("Failed to open Serial device: ", err.Error())
+			fmt.Println(errMsg)
+			response.Error = errMsg
+			json.NewEncoder(rw).Encode(response)
+			return
+		}
+
+		str, err := mdm.SendAt(`AT+CUSD=1,"*121#",15`)
+		if err != nil {
+			errMsg := fmt.Sprintln("Failed to send AT command: ", err)
+			fmt.Println(errMsg)
+			response.Error = errMsg
+			json.NewEncoder(rw).Encode(response)
+			return
+		}
+
+		fmt.Println("Cellular Internet Balance: ", str)
+		response.Balance = str
+
+		json.NewEncoder(rw).Encode(response)
+	})
+
+	w.mux.HandleFunc("/info/cellular/tariff", func(rw http.ResponseWriter, r *http.Request) {
+		type Response struct {
+			Error  string `json:"error"`
+			Tariff string `json:"tariff"`
+		}
+		response := &Response{}
+
+		mdm := &gmodem.Modem{
+			DevFile:     "/dev/ttyUSB2",
+			ReadTimeout: 20 * time.Second,
+		}
+
+		err := mdm.Open()
+		if err != nil {
+			errMsg := fmt.Sprintln("Failed to open Serial device: ", err.Error())
+			fmt.Println(errMsg)
+			response.Error = errMsg
+			json.NewEncoder(rw).Encode(response)
+			return
+		}
+
+		str, err := mdm.SendAt(`AT+CUSD=1,"*161#",15`)
+		if err != nil {
+			errMsg := fmt.Sprintln("Failed to send AT command: ", err)
+			fmt.Println(errMsg)
+			response.Error = errMsg
+			json.NewEncoder(rw).Encode(response)
+			return
+		}
+
+		fmt.Println("Cellular Tariff: ", str)
+		response.Tariff = str
 
 		json.NewEncoder(rw).Encode(response)
 	})

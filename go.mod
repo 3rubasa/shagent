@@ -15,13 +15,16 @@ require (
 	github.com/holoplot/go-avahi v1.0.1 // indirect
 	github.com/miekg/dns v1.1.41 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pkg/term v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/procyon-projects/chrono v1.1.2 // indirect
 	github.com/sigurn/crc8 v0.0.0-20160107002456-e55481d6f45c // indirect
 	github.com/sigurn/utils v0.0.0-20190728110027-e1fefb11a144 // indirect
+	github.com/sitec-systems/gmodem v0.0.0-20170113084156-4ef99c9a7602 // indirect
 	github.com/stianeikeland/go-rpio v4.2.0+incompatible // indirect
 	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/waltzofpearls/go-servo-picobber v0.0.0-20160515022420-5295f680804e // indirect
+	github.com/xlab/at v0.0.0-20220814165740-379970a8a2cb // indirect
 	gobot.io/x/gobot v1.16.0 // indirect
 	golang.org/x/net v0.0.0-20210410081132-afb366fc7cd1 // indirect
 	golang.org/x/sys v0.0.0-20210330210617-4fbd30eecc44 // indirect
