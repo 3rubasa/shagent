@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/3rubasa/shagent/controllers"
 )
 
 type WebServer interface {
@@ -16,23 +18,65 @@ type WebServer interface {
 const port = 8888
 
 type webServer struct {
-	mux *http.ServeMux
-	srv *http.Server
+	mux    *http.ServeMux
+	srv    *http.Server
+	boiler controllers.BoilerController
 }
 
-func New() WebServer {
-	return &webServer{}
+func New(boiler controllers.BoilerController) WebServer {
+	return &webServer{
+		boiler: boiler,
+	}
 }
 
 func (w *webServer) Initialize() error {
 	w.mux = http.NewServeMux()
 	w.mux.HandleFunc("/controllers/boiler/get_state", func(rw http.ResponseWriter, r *http.Request) {
 		type Response struct {
-			R string `json:"response"`
+			State string `json:"relay_state"`
+			Error string `json:"error"`
 		}
 
-		response := &Response{
-			R: "Hello World",
+		response := &Response{}
+
+		state, err := w.boiler.GetState()
+		if err != nil {
+			fmt.Println("Failed to get relay state: ", err)
+			response.Error = err.Error()
+		} else {
+			response.State = state
+		}
+
+		json.NewEncoder(rw).Encode(response)
+	})
+
+	w.mux.HandleFunc("/controllers/boiler/turn_on", func(rw http.ResponseWriter, r *http.Request) {
+		type Response struct {
+			Error string `json:"error"`
+		}
+
+		response := &Response{}
+
+		err := w.boiler.TurnOn()
+		if err != nil {
+			fmt.Println("Failed to turn relay on: ", err)
+			response.Error = err.Error()
+		}
+
+		json.NewEncoder(rw).Encode(response)
+	})
+
+	w.mux.HandleFunc("/controllers/boiler/turn_off", func(rw http.ResponseWriter, r *http.Request) {
+		type Response struct {
+			Error string `json:"error"`
+		}
+
+		response := &Response{}
+
+		err := w.boiler.TurnOff()
+		if err != nil {
+			fmt.Println("Failed to turn relay off: ", err)
+			response.Error = err.Error()
 		}
 
 		json.NewEncoder(rw).Encode(response)

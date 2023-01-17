@@ -9,6 +9,7 @@ import (
 	"time"
 
 	//"bitbucket.org/gmcbay/i2c"
+	"github.com/3rubasa/shagent/controllers/boiler"
 	"github.com/3rubasa/shagent/controllers/light"
 	"github.com/3rubasa/shagent/controllers/watchdog"
 	"github.com/3rubasa/shagent/sensors/power"
@@ -37,21 +38,26 @@ const sampleInterval = time.Second * 60
 // }
 
 func main() {
+	var err error
+
 	wd := watchdog.New()
 	wd.Initialize()
 	wd.Start()
 
-	ws := webserver.New()
-	err := ws.Initialize()
+	b := boiler.New()
+	err = b.Initialize()
 	if err != nil {
-		fmt.Println("Failed to initialize the web server: ", err)
+		fmt.Println("Failed to initialize boiler controller: ", err)
 		return
 	}
-	err = ws.Start()
+
+	err = b.Start()
 	if err != nil {
-		fmt.Println("Failed to start the web server: ", err)
+		fmt.Println("Failed to start boiler controller: ", err)
 		return
 	}
+
+	//b.TurnOff()
 
 	l := light.New()
 	err = l.Initialize()
@@ -83,6 +89,18 @@ func main() {
 		return
 	}
 
+	ws := webserver.New(b)
+	err = ws.Initialize()
+	if err != nil {
+		fmt.Println("Failed to initialize the web server: ", err)
+		return
+	}
+	err = ws.Start()
+	if err != nil {
+		fmt.Println("Failed to start the web server: ", err)
+		return
+	}
+
 	for {
 		var t float64
 
@@ -100,14 +118,33 @@ func main() {
 			fmt.Println("Error while getting power status: ", err)
 		}
 
-		SendMeasurements(t, p)
+		// Boiler
+		bs := -1
+		bsStr, err := b.GetState()
+		if err != nil {
+			fmt.Println("Failed to get boiler state: ", err)
+			bs = -1
+		} else {
+			switch bsStr {
+			case "on":
+				bs = 1
+			case "off":
+				bs = 0
+			default:
+				fmt.Println("Error invalid boiler state: ", bsStr)
+				bs = -1
+			}
+		}
+
+		SendMeasurements(t, p, bs)
+
 		time.Sleep(sampleInterval)
 	}
 }
 
-func SendMeasurements(t float64, p int) error {
+func SendMeasurements(t float64, p int, bs int) error {
 	//bodyReader := bytes.NewReader([]byte(body))
-	url := fmt.Sprintf("https://api.thingspeak.com/update?api_key=TL9W7QIEFKFIYIS7&field1=%f&field2=%d", t, p)
+	url := fmt.Sprintf("https://api.thingspeak.com/update?api_key=TL9W7QIEFKFIYIS7&field1=%f&field2=%d&field3=%d", t, p, bs)
 	fmt.Printf("About to send request: %s \n", url)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
