@@ -1,0 +1,8 @@
+1. $ sudo crontab -e # Edit crontab for root
+2. Insert the following line:
+    @reboot /home/dima/sim7600.sh >> /home/dima/cronlog.txt 2>&1
+
+    Ctrl+X, save
+3. Reboot
+
+The script will run as root on each boot
