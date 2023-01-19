@@ -1,10 +1,13 @@
 .PHONY: default all
 
-local: build deploy_local
-remote: build deploy_remote
+local: build_raspi deploy_local
+remote: build_raspi deploy_remote
 default: build deploy
 
-build:
+build_linux_amd64:
+	go env -w GOOS=linux && go env -w GOARCH=amd64 && go build -o bin/shagent
+
+build_raspi:
 	go env -w GOOS=linux && go env -w GOARCH=arm64 && go build -o bin/shagent
 
 deploy_remote:
