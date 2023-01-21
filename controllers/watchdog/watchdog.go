@@ -1,48 +1,45 @@
 package watchdog
 
+// Improvemens:
+// 1. The application needs to be normally shut down before restart
+// 2. Configuration should be provided as a struct (read from toml?)
+
 import (
 	"fmt"
-	"net/http"
-	"syscall"
 	"time"
-
-	"github.com/3rubasa/shagent/controllers"
 )
 
-const period = 30 * time.Minute
-const url = "https://google.com"
-
-type watchdog struct {
-	ticker   *time.Ticker
-	done     chan bool
-	errCount uint8
+type InternetChecker interface {
+	IsInternetAvailable() (bool, error)
 }
 
-var watchdogSingleton *watchdog
+type Watchdog struct {
+	ticker      *time.Ticker
+	period      time.Duration
+	done        chan bool
+	errCount    uint8
+	osservices  OSServicesProvider
+	inetchecker InternetChecker
+}
 
-func New() controllers.Watchdog {
-	if watchdogSingleton == nil {
-		watchdogSingleton = &watchdog{}
+func New(osservices OSServicesProvider, inetchecker InternetChecker, period time.Duration) *Watchdog {
+	return &Watchdog{
+		done:        make(chan bool),
+		osservices:  osservices,
+		inetchecker: inetchecker,
+		period:      period,
 	}
-
-	return watchdogSingleton
 }
 
-func (p *watchdog) Initialize() error {
-	p.done = make(chan bool)
-
-	return nil
-}
-
-func (p *watchdog) Start() error {
-	p.ticker = time.NewTicker(period)
+func (p *Watchdog) Start() error {
+	p.ticker = time.NewTicker(p.period)
 	go func() {
 		for {
 			select {
 			case <-p.done:
 				return
 			case <-p.ticker.C:
-				p.TestInternetConnection()
+				p.testInternetConnection()
 			}
 		}
 	}()
@@ -50,41 +47,29 @@ func (p *watchdog) Start() error {
 	return nil
 }
 
-func (p *watchdog) Stop() {
+func (p *Watchdog) Stop() {
 	p.ticker.Stop()
 	p.done <- true
 }
 
-func InternetIsAvailable() bool {
-	fmt.Printf("About to send request to check if Internet is available: %s \n", url)
+func (p *Watchdog) testInternetConnection() {
+	var err error
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		fmt.Printf("Error while creating request: %s \n", err.Error())
-		return false
-	}
-
-	client := http.Client{
-		Timeout: 30 * time.Second,
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Printf("Error while sending request: %s \n", err.Error())
-		return false
-	}
-
-	if resp.StatusCode >= 400 {
-		err = fmt.Errorf("response status is >= 400: %d", resp.StatusCode)
-		fmt.Printf("Error: %s \n", err.Error())
-		return false
-	}
-
-	return true
-}
-func (p *watchdog) TestInternetConnection() {
 	// Check internet connection
-	internetIsAvail := InternetIsAvailable()
+	internetIsAvail, err := p.inetchecker.IsInternetAvailable()
+	if err != nil {
+		fmt.Printf("Failed to check internet availability: %s. Rebooting immediately.\n", err.Error())
+		err = p.osservices.Reboot()
+		if err != nil {
+			fmt.Println("Reboot failed: ", err)
+		} else {
+			// For testing purposes
+			p.Stop()
+		}
+
+		return
+	}
+
 	if internetIsAvail {
 		p.errCount = 0
 	} else {
@@ -93,6 +78,12 @@ func (p *watchdog) TestInternetConnection() {
 
 	if p.errCount >= 3 {
 		fmt.Printf("Internet is not available for the 3rd time in a row, issuing reboot command \n")
-		syscall.Reboot(syscall.LINUX_REBOOT_CMD_RESTART)
+		err = p.osservices.Reboot()
+		if err != nil {
+			fmt.Println("Failed to reboot: ", err)
+		} else {
+			// For testing purposes
+			p.Stop()
+		}
 	}
 }

@@ -1,13 +1,25 @@
-package boiler
+package osservices
 
 import (
 	"bytes"
 	"fmt"
 	"os/exec"
 	"regexp"
+	"syscall"
 )
 
-func GetIPFromMAC(mac string) (string, error) {
+type OSServices struct {
+}
+
+func NewOSServicesProvider() *OSServices {
+	return &OSServices{}
+}
+
+func (o OSServices) Reboot() error {
+	return syscall.Reboot(syscall.LINUX_REBOOT_CMD_RESTART)
+}
+
+func (o OSServices) GetIPFromMAC(mac string) (string, error) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 

@@ -23,10 +23,10 @@ const port = 8888
 type webServer struct {
 	mux    *http.ServeMux
 	srv    *http.Server
-	boiler controllers.BoilerController
+	boiler controllers.RelayController
 }
 
-func New(boiler controllers.BoilerController) WebServer {
+func New(boiler controllers.RelayController) WebServer {
 	return &webServer{
 		boiler: boiler,
 	}

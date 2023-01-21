@@ -15,3 +15,12 @@ deploy_remote:
 
 deploy_local:
 	plink -pw p dima@10.42.0.1 "sudo systemctl stop shagent.service" && pscp -pw p ./bin/shagent dima@10.42.0.1:/home/dima/go/src/shagent/bin && plink -pw p dima@10.42.0.1 "sudo systemctl start shagent.service"
+
+codegen:
+	go generate ./...
+
+test_all:
+	env SH_RUN_ALL_TESTS=1 go test -count=1 ./...
+
+test:
+	env SH_RUN_ALL_TESTS=0 go test -count=1 ./...

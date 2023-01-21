@@ -9,9 +9,12 @@ import (
 	"time"
 
 	//"bitbucket.org/gmcbay/i2c"
-	"github.com/3rubasa/shagent/controllers/boiler"
+
 	"github.com/3rubasa/shagent/controllers/light"
+	"github.com/3rubasa/shagent/controllers/relay"
+	"github.com/3rubasa/shagent/controllers/relay/sonoffr3rf"
 	"github.com/3rubasa/shagent/controllers/watchdog"
+	"github.com/3rubasa/shagent/osservices"
 	"github.com/3rubasa/shagent/sensors/power"
 	"github.com/3rubasa/shagent/sensors/temperature"
 	"github.com/3rubasa/shagent/webserver"
@@ -19,46 +22,27 @@ import (
 
 const sampleInterval = time.Second * 60
 
-// func SwitchRalayOn() {
-// 	fmt.Println("opening gpio")
-// 	err := rpio.Open()
-// 	if err != nil {
-// 		panic(fmt.Sprint("unable to open gpio", err.Error()))
-// 	}
-
-// 	defer rpio.Close()
-
-// 	pin := rpio.Pin(26)
-// 	pin.Output()
-
-// 	for x := 0; x < 20; x++ {
-// 		pin.Toggle()
-// 		time.Sleep(time.Second * 5)
-// 	}
-// }
-
 func main() {
 	var err error
 
-	wd := watchdog.New()
-	wd.Initialize()
+	// Common
+	osservices := osservices.NewOSServicesProvider()
+
+	// 1 - watchdog DONE
+	inetchecker := watchdog.NewInternetChecker("http://google.com")
+	wd := watchdog.New(osservices, inetchecker, 30*time.Minute)
 	wd.Start()
 
-	b := boiler.New()
-	err = b.Initialize()
-	if err != nil {
-		fmt.Println("Failed to initialize boiler controller: ", err)
-		return
-	}
-
+	// 2 - boiler
+	relayDevice := sonoffr3rf.New(osservices, "24:a1:60:1d:72:9d")
+	// TODO: set proper period
+	b := relay.New(relayDevice, 10*time.Second)
 	err = b.Start()
 	if err != nil {
-		fmt.Println("Failed to start boiler controller: ", err)
-		return
+		fmt.Println("Failed to start boiler relay controller: ", err)
 	}
 
-	//b.TurnOff()
-
+	// 3 - light
 	l := light.New()
 	err = l.Initialize()
 	if err != nil {
@@ -73,6 +57,7 @@ func main() {
 	}
 	defer l.Stop()
 
+	// 4 - temperature
 	tp := temperature.New()
 
 	err = tp.Initialize()
@@ -81,6 +66,7 @@ func main() {
 		return
 	}
 
+	// 5 - power
 	pp := power.New()
 
 	err = pp.Initialize()
@@ -89,6 +75,7 @@ func main() {
 		return
 	}
 
+	// 6 - webserver
 	ws := webserver.New(b)
 	err = ws.Initialize()
 	if err != nil {
