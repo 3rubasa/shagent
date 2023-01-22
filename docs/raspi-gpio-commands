@@ -1,0 +1,2 @@
+1. > pinout # prints GPIO pins layout and numbers
+2. > raspi-gpio # getting/setting gpio pins states, for debugging purposes

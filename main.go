@@ -10,9 +10,9 @@ import (
 
 	//"bitbucket.org/gmcbay/i2c"
 
-	"github.com/3rubasa/shagent/controllers/light"
 	"github.com/3rubasa/shagent/controllers/relay"
 	"github.com/3rubasa/shagent/controllers/relay/sonoffr3rf"
+	"github.com/3rubasa/shagent/controllers/relay/wsraspihatx3"
 	"github.com/3rubasa/shagent/controllers/watchdog"
 	"github.com/3rubasa/shagent/osservices"
 	"github.com/3rubasa/shagent/sensors/power"
@@ -33,29 +33,42 @@ func main() {
 	wd := watchdog.New(osservices, inetchecker, 30*time.Minute)
 	wd.Start()
 
-	// 2 - boiler
-	relayDevice := sonoffr3rf.New(osservices, "24:a1:60:1d:72:9d")
-	// TODO: set proper period
-	b := relay.New(relayDevice, 10*time.Second)
-	err = b.Start()
+	// 2 - boiler DONE
+	sonoffr3rfRelay := sonoffr3rf.New(osservices, "24:a1:60:1d:72:9d")
+	boiler := relay.New(sonoffr3rfRelay, 30*time.Minute)
+	err = boiler.Start()
 	if err != nil {
 		fmt.Println("Failed to start boiler relay controller: ", err)
+		// TODO: Later, if boiler has failed to start, what are we going to do?
 	}
 
-	// 3 - light
-	l := light.New()
-	err = l.Initialize()
+	// 3 - roomLight
+	// TODO: Later, if roomLight is nil, what are we going to do?
+	var roomLight *relay.Relay
+	wsRelayForRoomLight, err := wsraspihatx3.New(wsraspihatx3.RelayChannel1)
 	if err != nil {
-		fmt.Println("Failed to initialize light controller: ", err)
-		return
+		fmt.Println("Failed to create WaveShare Raspi Hat relay device: ", err)
+	} else {
+		roomLight = relay.New(wsRelayForRoomLight, 30*time.Minute)
+		err = roomLight.Start()
+		if err != nil {
+			fmt.Println("Failed to start boiler relay controller: ", err)
+		}
 	}
 
-	err = l.Start()
+	// 4 - camLight
+	// TODO: Later, if cam light is nil, what are we going to do?
+	var camLight *relay.Relay
+	wsRelayForCamLight, err := wsraspihatx3.New(wsraspihatx3.RelayChannel2)
 	if err != nil {
-		fmt.Println("Failed to start light controller: ", err)
-		return
+		fmt.Println("Failed to create WaveShare Raspi Hat relay device for cam light: ", err)
+	} else {
+		camLight = relay.New(wsRelayForCamLight, 30*time.Minute)
+		err = camLight.Start()
+		if err != nil {
+			fmt.Println("Failed to start cam light relay controller: ", err)
+		}
 	}
-	defer l.Stop()
 
 	// 4 - temperature
 	tp := temperature.New()
@@ -76,7 +89,7 @@ func main() {
 	}
 
 	// 6 - webserver
-	ws := webserver.New(b)
+	ws := webserver.New(boiler, roomLight, camLight)
 	err = ws.Initialize()
 	if err != nil {
 		fmt.Println("Failed to initialize the web server: ", err)
@@ -107,7 +120,7 @@ func main() {
 
 		// Boiler
 		bs := -1
-		bsStr, err := b.GetState()
+		bsStr, err := boiler.GetState()
 		if err != nil {
 			fmt.Println("Failed to get boiler state: ", err)
 			bs = -1

@@ -21,14 +21,18 @@ type WebServer interface {
 const port = 8888
 
 type webServer struct {
-	mux    *http.ServeMux
-	srv    *http.Server
-	boiler controllers.RelayController
+	mux       *http.ServeMux
+	srv       *http.Server
+	boiler    controllers.RelayController
+	roomLight controllers.RelayController
+	camLight  controllers.RelayController
 }
 
-func New(boiler controllers.RelayController) WebServer {
+func New(boiler, roomLight, camLight controllers.RelayController) WebServer {
 	return &webServer{
-		boiler: boiler,
+		boiler:    boiler,
+		roomLight: roomLight,
+		camLight:  camLight,
 	}
 }
 
@@ -77,6 +81,107 @@ func (w *webServer) Initialize() error {
 		response := &Response{}
 
 		err := w.boiler.TurnOff()
+		if err != nil {
+			fmt.Println("Failed to turn relay off: ", err)
+			response.Error = err.Error()
+		}
+
+		json.NewEncoder(rw).Encode(response)
+	})
+	w.mux.HandleFunc("/controllers/room_light/get_state", func(rw http.ResponseWriter, r *http.Request) {
+		type Response struct {
+			State string `json:"relay_state"`
+			Error string `json:"error"`
+		}
+
+		response := &Response{}
+
+		state, err := w.roomLight.GetState()
+		if err != nil {
+			fmt.Println("Failed to get relay state: ", err)
+			response.Error = err.Error()
+		} else {
+			response.State = state
+		}
+
+		json.NewEncoder(rw).Encode(response)
+	})
+
+	w.mux.HandleFunc("/controllers/room_light/turn_on", func(rw http.ResponseWriter, r *http.Request) {
+		type Response struct {
+			Error string `json:"error"`
+		}
+
+		response := &Response{}
+
+		err := w.roomLight.TurnOn()
+		if err != nil {
+			fmt.Println("Failed to turn relay on: ", err)
+			response.Error = err.Error()
+		}
+
+		json.NewEncoder(rw).Encode(response)
+	})
+
+	w.mux.HandleFunc("/controllers/room_light/turn_off", func(rw http.ResponseWriter, r *http.Request) {
+		type Response struct {
+			Error string `json:"error"`
+		}
+
+		response := &Response{}
+
+		err := w.roomLight.TurnOff()
+		if err != nil {
+			fmt.Println("Failed to turn relay off: ", err)
+			response.Error = err.Error()
+		}
+
+		json.NewEncoder(rw).Encode(response)
+	})
+
+	w.mux.HandleFunc("/controllers/cam_light/get_state", func(rw http.ResponseWriter, r *http.Request) {
+		type Response struct {
+			State string `json:"relay_state"`
+			Error string `json:"error"`
+		}
+
+		response := &Response{}
+
+		state, err := w.camLight.GetState()
+		if err != nil {
+			fmt.Println("Failed to get relay state: ", err)
+			response.Error = err.Error()
+		} else {
+			response.State = state
+		}
+
+		json.NewEncoder(rw).Encode(response)
+	})
+
+	w.mux.HandleFunc("/controllers/cam_light/turn_on", func(rw http.ResponseWriter, r *http.Request) {
+		type Response struct {
+			Error string `json:"error"`
+		}
+
+		response := &Response{}
+
+		err := w.camLight.TurnOn()
+		if err != nil {
+			fmt.Println("Failed to turn relay on: ", err)
+			response.Error = err.Error()
+		}
+
+		json.NewEncoder(rw).Encode(response)
+	})
+
+	w.mux.HandleFunc("/controllers/cam_light/turn_off", func(rw http.ResponseWriter, r *http.Request) {
+		type Response struct {
+			Error string `json:"error"`
+		}
+
+		response := &Response{}
+
+		err := w.camLight.TurnOff()
 		if err != nil {
 			fmt.Println("Failed to turn relay off: ", err)
 			response.Error = err.Error()

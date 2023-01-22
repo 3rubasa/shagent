@@ -1,0 +1,12 @@
+iCSee
+Account:
+    user: Rubasa3
+    pass: fdg@3571
+
+Camera:
+    device_name: robot_b35a
+    pass: fdg@3571
+
+Web Interface:
+    user: admin
+    pass: fdg@3571

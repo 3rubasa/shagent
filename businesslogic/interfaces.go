@@ -1,6 +1,6 @@
 package businesslogic
 
-type BoilerController interface {
+type BoilerDriver interface {
 	Start() error
 	Stop()
 	// Returns "on" or "off"
