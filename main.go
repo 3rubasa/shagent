@@ -10,6 +10,8 @@ import (
 
 	//"bitbucket.org/gmcbay/i2c"
 
+	"github.com/3rubasa/shagent/businesslogic"
+	"github.com/3rubasa/shagent/businesslogic/controllers/roomlight"
 	"github.com/3rubasa/shagent/controllers/relay"
 	"github.com/3rubasa/shagent/controllers/relay/sonoffr3rf"
 	"github.com/3rubasa/shagent/controllers/relay/wsraspihatx3"
@@ -36,11 +38,6 @@ func main() {
 	// 2 - boiler DONE
 	sonoffr3rfRelay := sonoffr3rf.New(osservices, "24:a1:60:1d:72:9d")
 	boiler := relay.New(sonoffr3rfRelay, 30*time.Minute)
-	err = boiler.Start()
-	if err != nil {
-		fmt.Println("Failed to start boiler relay controller: ", err)
-		// TODO: Later, if boiler has failed to start, what are we going to do?
-	}
 
 	// 3 - roomLight
 	// TODO: Later, if roomLight is nil, what are we going to do?
@@ -50,10 +47,6 @@ func main() {
 		fmt.Println("Failed to create WaveShare Raspi Hat relay device: ", err)
 	} else {
 		roomLight = relay.New(wsRelayForRoomLight, 30*time.Minute)
-		err = roomLight.Start()
-		if err != nil {
-			fmt.Println("Failed to start boiler relay controller: ", err)
-		}
 	}
 
 	// 4 - camLight
@@ -64,11 +57,16 @@ func main() {
 		fmt.Println("Failed to create WaveShare Raspi Hat relay device for cam light: ", err)
 	} else {
 		camLight = relay.New(wsRelayForCamLight, 30*time.Minute)
-		err = camLight.Start()
-		if err != nil {
-			fmt.Println("Failed to start cam light relay controller: ", err)
-		}
 	}
+
+	// 5 - Business logic
+	var ontimes, offtimes []string
+	ontimes = append(ontimes, "0 45 06 * * *", "0 10 17 * * *")
+	offtimes = append(offtimes, "0 15 08 * * *", "0 12 01 * * *")
+
+	roomLightController := roomlight.New(roomLight, ontimes, offtimes)
+	bl := businesslogic.New(roomLightController)
+	bl.Start()
 
 	// 4 - temperature
 	tp := temperature.New()

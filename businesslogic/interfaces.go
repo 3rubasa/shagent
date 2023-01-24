@@ -1,10 +1,6 @@
 package businesslogic
 
-type BoilerDriver interface {
+type RoomLightController interface {
 	Start() error
-	Stop()
-	// Returns "on" or "off"
-	GetState() (string, error)
-	TurnOn() error
-	TurnOff() error
+	Stop() error
 }
