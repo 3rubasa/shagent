@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/3rubasa/shagent/controllers/watchdog/mockinternetchecker"
-	"github.com/3rubasa/shagent/controllers/watchdog/mockosservicesprovider"
+	"github.com/3rubasa/shagent/watchdog/mockinternetchecker"
+	"github.com/3rubasa/shagent/watchdog/mockosservicesprovider"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/3rubasa/shagent/controllers"
+	"github.com/3rubasa/shagent/drivers"
 
 	"github.com/sitec-systems/gmodem"
 )
@@ -23,12 +23,12 @@ const port = 8888
 type webServer struct {
 	mux       *http.ServeMux
 	srv       *http.Server
-	boiler    controllers.RelayController
-	roomLight controllers.RelayController
-	camLight  controllers.RelayController
+	boiler    drivers.Relay
+	roomLight drivers.Relay
+	camLight  drivers.Relay
 }
 
-func New(boiler, roomLight, camLight controllers.RelayController) WebServer {
+func New(boiler, roomLight, camLight drivers.Relay) WebServer {
 	return &webServer{
 		boiler:    boiler,
 		roomLight: roomLight,

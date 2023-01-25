@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/3rubasa/shagent/controllers/relay/mockdeviceapi"
+	"github.com/3rubasa/shagent/drivers/relay/mockdeviceapi"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )

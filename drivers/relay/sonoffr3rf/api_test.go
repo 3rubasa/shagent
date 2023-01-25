@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/3rubasa/shagent/controllers/relay/sonoffr3rf/mockosservicesprovider"
+	"github.com/3rubasa/shagent/drivers/relay/sonoffr3rf/mockosservicesprovider"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )

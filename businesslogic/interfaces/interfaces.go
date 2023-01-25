@@ -8,3 +8,13 @@ type RelayDriver interface {
 	TurnOn() error
 	TurnOff() error
 }
+
+type TempSensorDriver interface {
+	Initialize() error
+	Get() (float64, error)
+}
+
+type PowerDriver interface {
+	Initialize() error
+	Get() (int, error)
+}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 
 	//"os"
 	//"syscall"
@@ -11,14 +10,16 @@ import (
 	//"bitbucket.org/gmcbay/i2c"
 
 	"github.com/3rubasa/shagent/businesslogic"
+	"github.com/3rubasa/shagent/businesslogic/controllers/power"
 	"github.com/3rubasa/shagent/businesslogic/controllers/roomlight"
-	"github.com/3rubasa/shagent/controllers/relay"
-	"github.com/3rubasa/shagent/controllers/relay/sonoffr3rf"
-	"github.com/3rubasa/shagent/controllers/relay/wsraspihatx3"
-	"github.com/3rubasa/shagent/controllers/watchdog"
+	"github.com/3rubasa/shagent/businesslogic/controllers/temperature"
+	"github.com/3rubasa/shagent/drivers/power/gpiopowersensor"
+	"github.com/3rubasa/shagent/drivers/relay"
+	"github.com/3rubasa/shagent/drivers/relay/sonoffr3rf"
+	"github.com/3rubasa/shagent/drivers/relay/wsraspihatx3"
+	"github.com/3rubasa/shagent/drivers/termo/dht22"
 	"github.com/3rubasa/shagent/osservices"
-	"github.com/3rubasa/shagent/sensors/power"
-	"github.com/3rubasa/shagent/sensors/temperature"
+	"github.com/3rubasa/shagent/watchdog"
 	"github.com/3rubasa/shagent/webserver"
 )
 
@@ -59,32 +60,9 @@ func main() {
 		camLight = relay.New(wsRelayForCamLight, 30*time.Minute)
 	}
 
-	// 5 - Business logic
-	var ontimes, offtimes []string
-	ontimes = append(ontimes, "0 45 06 * * *", "0 10 17 * * *")
-	offtimes = append(offtimes, "0 15 08 * * *", "0 12 01 * * *")
-
-	roomLightController := roomlight.New(roomLight, ontimes, offtimes)
-	bl := businesslogic.New(roomLightController)
-	bl.Start()
-
-	// 4 - temperature
-	tp := temperature.New()
-
-	err = tp.Initialize()
-	if err != nil {
-		fmt.Println("Failed to initialize temperature sensor: ", err)
-		return
-	}
-
 	// 5 - power
-	pp := power.New()
-
-	err = pp.Initialize()
-	if err != nil {
-		fmt.Println("Failed to initialize power sensor: ", err)
-		return
-	}
+	powerDriver := gpiopowersensor.New(16)
+	powerController := power.New(powerDriver)
 
 	// 6 - webserver
 	ws := webserver.New(boiler, roomLight, camLight)
@@ -99,73 +77,17 @@ func main() {
 		return
 	}
 
-	for {
-		var t float64
+	// 5 - Business logic
+	var ontimes, offtimes []string
+	ontimes = append(ontimes, "0 45 06 * * *", "0 10 17 * * *")
+	offtimes = append(offtimes, "0 15 08 * * *", "0 12 01 * * *")
 
-		t, err := tp.GetTemperature()
-		if err != nil {
-			fmt.Println("Error while getting temperature: ", err)
-		}
+	roomLightController := roomlight.New(roomLight, ontimes, offtimes)
 
-		fmt.Println("Current temperature is ", t)
+	// Kitchen Temperature Sensor
+	tempSensorDrv := dht22.New(4)
+	kitchenTempController := temperature.New(tempSensorDrv, 10*time.Minute, time.Minute)
 
-		var p int
-
-		p, err = pp.GetPowerStatus()
-		if err != nil {
-			fmt.Println("Error while getting power status: ", err)
-		}
-
-		// Boiler
-		bs := -1
-		bsStr, err := boiler.GetState()
-		if err != nil {
-			fmt.Println("Failed to get boiler state: ", err)
-			bs = -1
-		} else {
-			switch bsStr {
-			case "on":
-				bs = 1
-			case "off":
-				bs = 0
-			default:
-				fmt.Println("Error invalid boiler state: ", bsStr)
-				bs = -1
-			}
-		}
-
-		SendMeasurements(t, p, bs)
-
-		time.Sleep(sampleInterval)
-	}
-}
-
-func SendMeasurements(t float64, p int, bs int) error {
-	//bodyReader := bytes.NewReader([]byte(body))
-	url := fmt.Sprintf("https://api.thingspeak.com/update?api_key=TL9W7QIEFKFIYIS7&field1=%f&field2=%d&field3=%d", t, p, bs)
-	fmt.Printf("About to send request: %s \n", url)
-
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		fmt.Printf("Error while creating request: %s \n", err.Error())
-		return err
-	}
-
-	client := http.Client{
-		Timeout: 30 * time.Second,
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Printf("Error while sending request: %s \n", err.Error())
-		return err
-	}
-
-	if resp.StatusCode != 200 {
-		err = fmt.Errorf("response status is not 200: %d", resp.StatusCode)
-		fmt.Printf("Error: %s \n", err.Error())
-		return fmt.Errorf("response status is not 200: %d", resp.StatusCode)
-	}
-
-	return nil
+	bl := businesslogic.New(roomLightController, kitchenTempController, powerController, time.Minute)
+	bl.Start()
 }
