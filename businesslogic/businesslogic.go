@@ -62,7 +62,9 @@ func (b *BusinessLogic) Start() error {
 
 	b.pollingTicker = time.NewTicker(b.pollingPeriod)
 
-	return b.mainLoop()
+	go b.mainLoop()
+
+	return nil
 }
 
 func (b *BusinessLogic) Stop() error {
@@ -138,7 +140,7 @@ func (b *BusinessLogic) SendState() {
 	if s.PowerValid {
 		url += fmt.Sprintf("&field2=%d", s.Power)
 	}
-	
+
 	fmt.Printf("About to send request: %s \n", url)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)

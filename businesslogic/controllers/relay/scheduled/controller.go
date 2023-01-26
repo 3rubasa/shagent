@@ -1,14 +1,15 @@
-package roomlight
+package scheduledrelay
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/3rubasa/shagent/businesslogic/interfaces"
 	"github.com/procyon-projects/chrono"
 )
 
-type RoomLight struct {
+type ScheduledRelay struct {
 	driver    interfaces.RelayDriver
 	scheduler chrono.TaskScheduler
 	tasks     []chrono.ScheduledTask
@@ -16,8 +17,8 @@ type RoomLight struct {
 	offtimes  []string
 }
 
-func New(driver interfaces.RelayDriver, ontimes, offtimes []string) *RoomLight {
-	r := &RoomLight{
+func New(driver interfaces.RelayDriver, ontimes, offtimes []string) *ScheduledRelay {
+	r := &ScheduledRelay{
 		driver:   driver,
 		ontimes:  ontimes,
 		offtimes: offtimes,
@@ -26,7 +27,7 @@ func New(driver interfaces.RelayDriver, ontimes, offtimes []string) *RoomLight {
 	return r
 }
 
-func (r *RoomLight) Start() error {
+func (r *ScheduledRelay) Start() error {
 	// We always start with the light on
 	// TODO: make this smart
 	r.driver.TurnOn()
@@ -56,7 +57,7 @@ func (r *RoomLight) Start() error {
 	return r.driver.Start()
 }
 
-func (r *RoomLight) Stop() error {
+func (r *ScheduledRelay) Stop() error {
 	for _, t := range r.tasks {
 		t.Cancel()
 	}
@@ -69,14 +70,40 @@ func (r *RoomLight) Stop() error {
 	return nil
 }
 
-func (r *RoomLight) turnOnHandler(ctx context.Context) {
+func (r *ScheduledRelay) Get() (int, error) {
+	s, err := r.driver.GetState()
+	if err != nil {
+		fmt.Println("Failed to get state of the room light: ", err)
+		return 0, err
+	}
+
+	switch s {
+	case "on":
+		return 1, nil
+	case "off":
+		return 0, nil
+	default:
+		fmt.Println("Unexpected state: ", s)
+		return 0, errors.New("unexpected state")
+	}
+}
+
+func (r *ScheduledRelay) TurnOn() error {
+	return r.driver.TurnOn()
+}
+
+func (r *ScheduledRelay) TurnOff() error {
+	return r.driver.TurnOff()
+}
+
+func (r *ScheduledRelay) turnOnHandler(ctx context.Context) {
 	err := r.driver.TurnOn()
 	if err != nil {
 		fmt.Println("Error while turning the room lights on: ", err)
 	}
 }
 
-func (r *RoomLight) turnOffHandler(ctx context.Context) {
+func (r *ScheduledRelay) turnOffHandler(ctx context.Context) {
 	err := r.driver.TurnOff()
 	if err != nil {
 		fmt.Println("Error while turning the room lights off: ", err)

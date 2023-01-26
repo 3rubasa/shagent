@@ -18,3 +18,7 @@ type PowerDriver interface {
 	Initialize() error
 	Get() (int, error)
 }
+
+type LTEModuleDriver interface {
+	SendUSSD(ussd string) (string, error)
+}

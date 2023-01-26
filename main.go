@@ -10,9 +10,13 @@ import (
 	//"bitbucket.org/gmcbay/i2c"
 
 	"github.com/3rubasa/shagent/businesslogic"
+	"github.com/3rubasa/shagent/businesslogic/controllers/ltemodulecontroller"
 	"github.com/3rubasa/shagent/businesslogic/controllers/power"
-	"github.com/3rubasa/shagent/businesslogic/controllers/roomlight"
+	scheduledrelay "github.com/3rubasa/shagent/businesslogic/controllers/relay/scheduled"
+	simplerelay "github.com/3rubasa/shagent/businesslogic/controllers/relay/simple"
 	"github.com/3rubasa/shagent/businesslogic/controllers/temperature"
+	"github.com/3rubasa/shagent/drivers/ltemodule"
+	"github.com/3rubasa/shagent/drivers/ltemodule/sim7600"
 	"github.com/3rubasa/shagent/drivers/power/gpiopowersensor"
 	"github.com/3rubasa/shagent/drivers/relay"
 	"github.com/3rubasa/shagent/drivers/relay/sonoffr3rf"
@@ -37,57 +41,78 @@ func main() {
 	wd.Start()
 
 	// 2 - boiler DONE
-	sonoffr3rfRelay := sonoffr3rf.New(osservices, "24:a1:60:1d:72:9d")
-	boiler := relay.New(sonoffr3rfRelay, 30*time.Minute)
+	sonoffr3rfRelayDrv := sonoffr3rf.New(osservices, "24:a1:60:1d:72:9d")
+	boilerRelayDrv := relay.New(sonoffr3rfRelayDrv, 30*time.Minute)
+	boilerController := simplerelay.New(boilerRelayDrv)
 
-	// 3 - roomLight
+	// 3 - roomLight DONE
 	// TODO: Later, if roomLight is nil, what are we going to do?
-	var roomLight *relay.Relay
+	var roomLightRelayDrv *relay.Relay
 	wsRelayForRoomLight, err := wsraspihatx3.New(wsraspihatx3.RelayChannel1)
 	if err != nil {
 		fmt.Println("Failed to create WaveShare Raspi Hat relay device: ", err)
 	} else {
-		roomLight = relay.New(wsRelayForRoomLight, 30*time.Minute)
+		roomLightRelayDrv = relay.New(wsRelayForRoomLight, 30*time.Minute)
 	}
 
-	// 4 - camLight
+	var ontimes, offtimes []string
+	ontimes = append(ontimes, "0 45 06 * * *", "0 10 17 * * *")
+	offtimes = append(offtimes, "0 15 08 * * *", "0 12 01 * * *")
+
+	roomLightController := scheduledrelay.New(roomLightRelayDrv, ontimes, offtimes)
+
+	// 4 - camLight DONE
 	// TODO: Later, if cam light is nil, what are we going to do?
-	var camLight *relay.Relay
+	var camLightRelayDrv *relay.Relay
 	wsRelayForCamLight, err := wsraspihatx3.New(wsraspihatx3.RelayChannel2)
 	if err != nil {
-		fmt.Println("Failed to create WaveShare Raspi Hat relay device for cam light: ", err)
+		fmt.Println("Failed to create WaveShare Raspi Hat relay device: ", err)
 	} else {
-		camLight = relay.New(wsRelayForCamLight, 30*time.Minute)
+		camLightRelayDrv = relay.New(wsRelayForCamLight, 30*time.Minute)
 	}
 
-	// 5 - power
-	powerDriver := gpiopowersensor.New(16)
-	powerController := power.New(powerDriver)
+	camLightController := simplerelay.New(camLightRelayDrv)
 
-	// 6 - webserver
-	ws := webserver.New(boiler, roomLight, camLight)
+	// 5 - power DONE
+	powerSensorDrv := gpiopowersensor.New(16)
+	powerController := power.New(powerSensorDrv)
+
+	// 6 - Kitchen Temperature Sensor
+	tempSensorDrv := dht22.New(4)
+	kitchenTempController := temperature.New(tempSensorDrv, 10*time.Minute, time.Minute)
+
+	// 7 - LTEModule
+	sim7600Drv := sim7600.New("/dev/ttyUSB2", 20*time.Second)
+	lteDrv := ltemodule.New(sim7600Drv)
+	lteController := ltemodulecontroller.New(lteDrv)
+
+	// 8 - Business logic
+	bl := businesslogic.New(roomLightController, kitchenTempController, powerController, time.Minute)
+	bl.Start()
+
+	// 9 - webserver
+	components := &webserver.APIComponents{
+		RoomLight:   roomLightController,
+		CamLight:    camLightController,
+		KitchenTemp: kitchenTempController,
+		Power:       powerController,
+		Boiler:      boilerController,
+		LTEModule:   lteController,
+	}
+
+	ws := webserver.New(components, 8888)
 	err = ws.Initialize()
 	if err != nil {
 		fmt.Println("Failed to initialize the web server: ", err)
 		return
 	}
+
 	err = ws.Start()
 	if err != nil {
 		fmt.Println("Failed to start the web server: ", err)
 		return
 	}
 
-	// 5 - Business logic
-	var ontimes, offtimes []string
-	ontimes = append(ontimes, "0 45 06 * * *", "0 10 17 * * *")
-	offtimes = append(offtimes, "0 15 08 * * *", "0 12 01 * * *")
-
-	roomLightController := roomlight.New(roomLight, ontimes, offtimes)
-
-	// Kitchen Temperature Sensor
-	tempSensorDrv := dht22.New(4)
-	kitchenTempController := temperature.New(tempSensorDrv, 10*time.Minute, time.Minute)
-
-	bl := businesslogic.New(roomLightController, kitchenTempController, powerController, time.Minute)
-	bl.Start()
+	// TODO
+	time.Sleep(1000 * time.Hour)
 }
