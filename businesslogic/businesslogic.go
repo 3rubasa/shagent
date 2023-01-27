@@ -16,11 +16,13 @@ type BusinessLogic struct {
 	done          chan bool
 	pollingPeriod time.Duration
 	pollingTicker *time.Ticker
+	sendingPeriod time.Duration
+	sendingTicker *time.Ticker
 	stateMux      *sync.Mutex
 	state         state
 }
 
-func New(roomLight RoomLightController, kitchenTemp TempSensorController, powerController PowerSensorController, pollingPeriod time.Duration) *BusinessLogic {
+func New(roomLight RoomLightController, kitchenTemp TempSensorController, powerController PowerSensorController, pollingPeriod, sendingPeriod time.Duration) *BusinessLogic {
 	return &BusinessLogic{
 		//boiler:    boiler,
 		roomLight: roomLight,
@@ -28,7 +30,9 @@ func New(roomLight RoomLightController, kitchenTemp TempSensorController, powerC
 		kitchenTemp:   kitchenTemp,
 		power:         powerController,
 		done:          make(chan bool),
+		stateMux:      &sync.Mutex{},
 		pollingPeriod: pollingPeriod,
+		sendingPeriod: sendingPeriod,
 	}
 }
 
@@ -61,6 +65,7 @@ func (b *BusinessLogic) Start() error {
 	}
 
 	b.pollingTicker = time.NewTicker(b.pollingPeriod)
+	b.sendingTicker = time.NewTicker(b.sendingPeriod)
 
 	go b.mainLoop()
 
@@ -78,6 +83,8 @@ func (b *BusinessLogic) mainLoop() error {
 		select {
 		case <-b.pollingTicker.C:
 			b.pollSensors()
+		case <-b.sendingTicker.C:
+			b.sendState()
 		case <-b.done:
 			return nil
 		}
@@ -127,7 +134,7 @@ func (b *BusinessLogic) pollSensors() {
 	b.stateMux.Unlock()
 }
 
-func (b *BusinessLogic) SendState() {
+func (b *BusinessLogic) sendState() {
 	var s state
 	b.stateMux.Lock()
 	s = b.state

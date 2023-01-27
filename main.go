@@ -27,8 +27,6 @@ import (
 	"github.com/3rubasa/shagent/webserver"
 )
 
-const sampleInterval = time.Second * 60
-
 func main() {
 	var err error
 
@@ -37,7 +35,7 @@ func main() {
 
 	// 1 - watchdog DONE
 	inetchecker := watchdog.NewInternetChecker("http://google.com")
-	wd := watchdog.New(osservices, inetchecker, 30*time.Minute)
+	wd := watchdog.New(osservices, inetchecker, 20*time.Minute, 5*time.Minute, 5*time.Minute)
 	wd.Start()
 
 	// 2 - boiler DONE
@@ -87,7 +85,7 @@ func main() {
 	lteController := ltemodulecontroller.New(lteDrv)
 
 	// 8 - Business logic
-	bl := businesslogic.New(roomLightController, kitchenTempController, powerController, time.Minute)
+	bl := businesslogic.New(roomLightController, kitchenTempController, powerController, time.Minute, time.Minute)
 	bl.Start()
 
 	// 9 - webserver

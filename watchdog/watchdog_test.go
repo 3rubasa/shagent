@@ -22,9 +22,9 @@ func Test_InetNotAvail(t *testing.T) {
 
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	inetChecker := mockinternetchecker.NewMockInternetChecker(mockCtrl)
-	period := 200 * time.Millisecond
+	inetPeriod := 200 * time.Millisecond
 
-	wd := New(osSvcs, inetChecker, period)
+	wd := New(osSvcs, inetChecker, inetPeriod, inetPeriod, 500*time.Hour)
 
 	inetChecker.EXPECT().IsInternetAvailable().Return(false, nil).Times(3)
 	osSvcs.EXPECT().Reboot().Return(nil).Times(1)
@@ -47,7 +47,7 @@ func Test_InetAvail(t *testing.T) {
 	inetChecker := mockinternetchecker.NewMockInternetChecker(mockCtrl)
 	period := 200 * time.Millisecond
 
-	wd := New(osSvcs, inetChecker, period)
+	wd := New(osSvcs, inetChecker, period, period, 500*time.Hour)
 
 	inetChecker.EXPECT().IsInternetAvailable().Return(true, nil).MinTimes(1)
 	osSvcs.EXPECT().Reboot().Return(nil).Times(0)
@@ -70,7 +70,7 @@ func Test_InetAvail_Error(t *testing.T) {
 	inetChecker := mockinternetchecker.NewMockInternetChecker(mockCtrl)
 	period := 200 * time.Millisecond
 
-	wd := New(osSvcs, inetChecker, period)
+	wd := New(osSvcs, inetChecker, period, period, 500*time.Hour)
 
 	inetChecker.EXPECT().IsInternetAvailable().Return(true, errors.New("dummy error")).Times(1)
 	osSvcs.EXPECT().Reboot().Return(nil).Times(1)
@@ -93,7 +93,7 @@ func Test_InetAvail_Intermittent(t *testing.T) {
 	inetChecker := mockinternetchecker.NewMockInternetChecker(mockCtrl)
 	period := 200 * time.Millisecond
 
-	wd := New(osSvcs, inetChecker, period)
+	wd := New(osSvcs, inetChecker, period, period, 500*time.Hour)
 
 	counter := 0
 
