@@ -3,69 +3,88 @@ package businesslogic
 import (
 	"fmt"
 	"net/http"
+	urltools "net/url"
 	"sync"
 	"time"
 )
 
 type BusinessLogic struct {
-	//boiler    interfaces.RelayDriver
-	roomLight RoomLightController
-	//camLight  interfaces.RelayDriver
-	kitchenTemp   TempSensorController
-	power         PowerSensorController
-	done          chan bool
-	pollingPeriod time.Duration
-	pollingTicker *time.Ticker
-	sendingPeriod time.Duration
-	sendingTicker *time.Ticker
-	stateMux      *sync.Mutex
-	state         state
+	c                *BusinessLogicComponents
+	p                *Processor
+	done             chan bool
+	pollingPeriod    time.Duration
+	pollingTicker    *time.Ticker
+	sendingPeriod    time.Duration
+	sendingTicker    *time.Ticker
+	processingPeriod time.Duration
+	processingTicker *time.Ticker
+	stateMux         *sync.Mutex
+	state            state
 }
 
-func New(roomLight RoomLightController, kitchenTemp TempSensorController, powerController PowerSensorController, pollingPeriod, sendingPeriod time.Duration) *BusinessLogic {
+func New(c *BusinessLogicComponents, p *Processor, pollingPeriod, sendingPeriod, processingPeriod time.Duration) *BusinessLogic {
 	return &BusinessLogic{
-		//boiler:    boiler,
-		roomLight: roomLight,
-		//camLight:  camLight,
-		kitchenTemp:   kitchenTemp,
-		power:         powerController,
-		done:          make(chan bool),
-		stateMux:      &sync.Mutex{},
-		pollingPeriod: pollingPeriod,
-		sendingPeriod: sendingPeriod,
+		c:                c,
+		p:                p,
+		done:             make(chan bool),
+		stateMux:         &sync.Mutex{},
+		pollingPeriod:    pollingPeriod,
+		sendingPeriod:    sendingPeriod,
+		processingPeriod: processingPeriod,
 	}
 }
 
 func (b *BusinessLogic) Start() error {
 	var err error
 
-	// err = b.boiler.Start()
-	// if err != nil {
-	// 	fmt.Println("Failed to start boiler relay: ", err)
-	// }
-
-	err = b.roomLight.Start()
-	if err != nil {
-		fmt.Println("Failed to start room light relay controller: ", err)
-	}
-
-	// err = b.camLight.Start()
-	// if err != nil {
-	// 	fmt.Println("Failed to start cam light relay controller: ", err)
-	// }
-
-	err = b.kitchenTemp.Start()
+	err = b.c.KitchenTemp.Start()
 	if err != nil {
 		fmt.Println("Failed to start kitchen temperature sensor controller: ", err)
 	}
 
-	err = b.power.Start()
+	err = b.c.WindowTemp.Start()
+	if err != nil {
+		fmt.Println("Failed to start window temperature sensor controller: ", err)
+	}
+
+	err = b.c.OutdoorsTemp.Start()
+	if err != nil {
+		fmt.Println("Failed to start outdoors temperature sensor controller: ", err)
+	}
+
+	err = b.c.WeatherTemp.Start()
+	if err != nil {
+		fmt.Println("Failed to start weather temperature sensor controller: ", err)
+	}
+
+	err = b.c.ForecastTemp.Start()
+	if err != nil {
+		fmt.Println("Failed to start weathr forecast provider controller: ", err)
+	}
+
+	err = b.c.RoomLight.Start()
+	if err != nil {
+		fmt.Println("Failed to start room light relay controller: ", err)
+	}
+
+	err = b.c.CamLight.Start()
+	if err != nil {
+		fmt.Println("Failed to start cam light relay controller: ", err)
+	}
+
+	err = b.c.Power.Start()
 	if err != nil {
 		fmt.Println("Failed to start power sensor controller: ", err)
 	}
 
+	err = b.c.Boiler.Start()
+	if err != nil {
+		fmt.Println("Failed to start boiler controller: ", err)
+	}
+
 	b.pollingTicker = time.NewTicker(b.pollingPeriod)
 	b.sendingTicker = time.NewTicker(b.sendingPeriod)
+	b.processingTicker = time.NewTicker(b.processingPeriod)
 
 	go b.mainLoop()
 
@@ -85,6 +104,8 @@ func (b *BusinessLogic) mainLoop() error {
 			b.pollSensors()
 		case <-b.sendingTicker.C:
 			b.sendState()
+		case <-b.processingTicker.C:
+			b.processState()
 		case <-b.done:
 			return nil
 		}
@@ -93,9 +114,10 @@ func (b *BusinessLogic) mainLoop() error {
 
 func (b *BusinessLogic) pollSensors() {
 	var t float64
-
+	var err error
 	var s state
-	t, err := b.kitchenTemp.Get()
+
+	t, err = b.c.KitchenTemp.Get()
 	if err != nil {
 		fmt.Println("Error while getting kitchen temperature: ", err)
 	} else {
@@ -103,7 +125,39 @@ func (b *BusinessLogic) pollSensors() {
 		s.KitchenTempValid = true
 	}
 
-	p, err := b.power.Get()
+	t, err = b.c.WindowTemp.Get()
+	if err != nil {
+		fmt.Println("Error while getting window temperature: ", err)
+	} else {
+		s.WindowTemp = t
+		s.WindowTempValid = true
+	}
+
+	t, err = b.c.WeatherTemp.Get()
+	if err != nil {
+		fmt.Println("Error while getting weather temperature: ", err)
+	} else {
+		s.WeatherTemp = t
+		s.WeatherTempValid = true
+	}
+
+	t, err = b.c.ForecastTemp.Get()
+	if err != nil {
+		fmt.Println("Error while getting forecast temperature: ", err)
+	} else {
+		s.ForecastedTemp = t
+		s.ForecastedTempValid = true
+	}
+
+	// t, err = b.c.OutdoorsTemp.Get()
+	// if err != nil {
+	// 	fmt.Println("Error while outdoors window temperature: ", err)
+	// } else {
+	// 	s.OutdoorsTemp = t
+	// 	s.OutdoorsTempValid = true
+	// }
+
+	p, err := b.c.Power.Get()
 	if err != nil {
 		fmt.Println("Error while getting power status: ", err)
 	} else {
@@ -111,23 +165,14 @@ func (b *BusinessLogic) pollSensors() {
 		s.PowerValid = true
 	}
 
-	// // Boiler
-	// bs := -1
-	// bsStr, err := boiler.GetState()
-	// if err != nil {
-	// 	fmt.Println("Failed to get boiler state: ", err)
-	// 	bs = -1
-	// } else {
-	// 	switch bsStr {
-	// 	case "on":
-	// 		bs = 1
-	// 	case "off":
-	// 		bs = 0
-	// 	default:
-	// 		fmt.Println("Error invalid boiler state: ", bsStr)
-	// 		bs = -1
-	// 	}
-	// }
+	// Boiler
+	bs, err := b.c.Boiler.Get()
+	if err != nil {
+		fmt.Println("Failed to get boiler state: ", err)
+	} else {
+		s.BoilerState = bs
+		s.BoilerStateValid = true
+	}
 
 	b.stateMux.Lock()
 	b.state = s
@@ -142,10 +187,25 @@ func (b *BusinessLogic) sendState() {
 
 	url := "https://api.thingspeak.com/update?api_key=TL9W7QIEFKFIYIS7"
 	if s.KitchenTempValid {
-		url += fmt.Sprintf("&field1=%f", s.KitchenTemp)
+		url += "&field1=" + urltools.QueryEscape(fmt.Sprintf("%f", s.KitchenTemp))
+	}
+	if s.WindowTempValid {
+		url += "&field2=" + urltools.QueryEscape(fmt.Sprintf("%f", s.WindowTemp))
+	}
+	if s.OutdoorsTempValid {
+		url += "&field3=" + urltools.QueryEscape(fmt.Sprintf("%f", s.OutdoorsTemp))
 	}
 	if s.PowerValid {
-		url += fmt.Sprintf("&field2=%d", s.Power)
+		url += "&field4=" + urltools.QueryEscape(fmt.Sprintf("%d", s.Power))
+	}
+	if s.BoilerStateValid {
+		url += "&field5=" + urltools.QueryEscape(fmt.Sprintf("%d", s.BoilerState))
+	}
+	if s.WeatherTempValid {
+		url += "&field6=" + urltools.QueryEscape(fmt.Sprintf("%f", s.WeatherTemp))
+	}
+	if s.ForecastedTempValid {
+		url += "&field7=" + urltools.QueryEscape(fmt.Sprintf("%f", s.ForecastedTemp))
 	}
 
 	fmt.Printf("About to send request: %s \n", url)
@@ -171,4 +231,12 @@ func (b *BusinessLogic) sendState() {
 		fmt.Printf("Error: %s \n", err.Error())
 		return
 	}
+}
+
+func (b *BusinessLogic) processState() {
+	b.stateMux.Lock()
+	s := b.state
+	b.stateMux.Unlock()
+
+	b.p.Process(s)
 }

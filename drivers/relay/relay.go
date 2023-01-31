@@ -120,3 +120,4 @@ func (p *Relay) onTicker() {
 		fmt.Printf("Error! Unexpected target state for boiler: %d\n", p.targetState)
 	}
 }
+ 
