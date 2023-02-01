@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -148,18 +149,25 @@ func (cw *ForecastProvider) updateTemperature(ctx context.Context) {
 		return
 	}
 
-	fmt.Println("Min temp from weather.io for today: ", respBody.Data[0].MinTemp)
-	fmt.Println("Min temp from weather.io for tomorrow: ", respBody.Data[1].MinTemp)
+	fmt.Printf("Forecast for today: min_tem=%f, max_temp=%f, low_tem=%f, high_temp=%f\n", respBody.Data[0].MinTemp, respBody.Data[0].MaxTemp, respBody.Data[0].LowTemp, respBody.Data[0].HighTemp)
+	fmt.Printf("Forecast for tomorrow: min_tem=%f, max_temp=%f, low_tem=%f, high_temp=%f\n", respBody.Data[1].MinTemp, respBody.Data[1].MaxTemp, respBody.Data[1].LowTemp, respBody.Data[1].HighTemp)
 
-	minTemp := respBody.Data[0].MinTemp
-	if respBody.Data[1].MinTemp < minTemp {
-		minTemp = respBody.Data[1].MinTemp
-	}
+	minTemp := GetMinTemperature(respBody.Data[0], respBody.Data[1])
 
 	cw.mux.Lock()
 	cw.minForecastTemp = minTemp
 	cw.minForecastTempTS = curTime
 	cw.mux.Unlock()
+}
+
+func GetMinTemperature(f1, f2 ResponseDataItem) float64 {
+	return math.Min(f1.MinTemp,
+		math.Min(f1.MaxTemp,
+			math.Min(f1.LowTemp,
+				math.Min(f1.HighTemp,
+					math.Min(f2.MinTemp,
+						math.Min(f2.MaxTemp,
+							math.Min(f2.LowTemp, f2.HighTemp)))))))
 }
 
 func ParseDate(date string) (time.Time, error) {

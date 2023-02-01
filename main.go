@@ -114,28 +114,30 @@ func main() {
 	}
 
 	tempControlTable := map[businesslogic.ForecestTempRange]map[businesslogic.WeatherTempRange]businesslogic.RoomTempRange{
-		{Min: -100, Max: 100}: {
-			{Min: -100, Max: -3}: {Min: 8, Max: 100}, // Don't turn off
-			{Min: -3, Max: 0}:    {Min: 6, Max: 8},
-			{Min: 0, Max: 5}:     {Min: 5, Max: 7},
-			{Min: 5, Max: 10}:    {Min: 3, Max: 5},
-			{Min: 10, Max: 100}:  {Min: 3, Max: 5},
-		},
-		{Min: -100, Max: -10}: {
+		{Min: -100, Max: -4}: {
 			{Min: -100, Max: 100}: {Min: 8, Max: 100}, // Don't turn off
 		},
-		{Min: -10, Max: -5}: {
-			{Min: -100, Max: 0}: {Min: 8, Max: 100}, // Don't turn off
-			{Min: 0, Max: 100}:    {Min: 6, Max: 8},
-		},
-		{Min: -5, Max: -1}: {
+		{Min: -4, Max: -3}: {
 			{Min: -100, Max: -3}: {Min: 8, Max: 100}, // Don't turn off
-			{Min: -3, Max: 0}:    {Min: 6, Max: 8},
-			{Min: 0, Max: 5}:     {Min: 5, Max: 7},
-			{Min: 5, Max: 10}:    {Min: 3, Max: 5},
-			{Min: 10, Max: 100}:  {Min: 3, Max: 5},
+			{Min: -3, Max: 100}:  {Min: 6, Max: 8},
 		},
-
+		{Min: -3, Max: -1}: {
+			{Min: -100, Max: -3}: {Min: 8, Max: 100}, // Don't turn off
+			{Min: -3, Max: 1}:    {Min: 5, Max: 6},
+			{Min: 1, Max: 100}:   {Min: 5, Max: 6},
+		},
+		{Min: -1, Max: 1}: {
+			{Min: -100, Max: -3}: {Min: 8, Max: 100}, // Don't turn off
+			{Min: -3, Max: 0}:    {Min: 5, Max: 6},
+			{Min: 0, Max: 5}:     {Min: 5, Max: 6},
+			{Min: 5, Max: 100}:   {Min: 4, Max: 5},
+		},
+		{Min: 1, Max: 100}: {
+			{Min: -100, Max: -3}: {Min: 8, Max: 100}, // Don't turn off
+			{Min: -3, Max: 0}:    {Min: 5, Max: 6},
+			{Min: 0, Max: 1}:     {Min: 4, Max: 5},
+			{Min: 1, Max: 100}:   {Min: 3, Max: 4},
+		},
 	}
 
 	businessRules := &businesslogic.BusinessRules{

@@ -30,3 +30,24 @@ func TestDateConvertor_Fail2(t *testing.T) {
 	_, err := ParseDate(input)
 	assert.Error(t, err)
 }
+
+func TestGetMin(t *testing.T) {
+	f1 := ResponseDataItem{
+		MinTemp:  -1,
+		MaxTemp:  -2,
+		LowTemp:  -3,
+		HighTemp: 4,
+	}
+
+	f2 := ResponseDataItem{
+		MinTemp:  2,
+		MaxTemp:  -8,
+		LowTemp:  -3,
+		HighTemp: -1,
+	}
+
+	expected := -8.0
+	actual := GetMinTemperature(f1, f2)
+
+	assert.Equal(t, expected, actual)
+}
