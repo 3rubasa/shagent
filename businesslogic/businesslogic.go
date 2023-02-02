@@ -6,11 +6,14 @@ import (
 	urltools "net/url"
 	"sync"
 	"time"
+
+	"github.com/3rubasa/shagent/config"
 )
 
 type BusinessLogic struct {
 	c                *BusinessLogicComponents
 	p                *Processor
+	cfg              *config.BusinessLogicConfig
 	done             chan bool
 	pollingPeriod    time.Duration
 	pollingTicker    *time.Ticker
@@ -22,7 +25,7 @@ type BusinessLogic struct {
 	state            state
 }
 
-func New(c *BusinessLogicComponents, p *Processor, pollingPeriod, sendingPeriod, processingPeriod time.Duration) *BusinessLogic {
+func New(cfg *config.BusinessLogicConfig, c *BusinessLogicComponents, p *Processor, pollingPeriod, sendingPeriod, processingPeriod time.Duration) *BusinessLogic {
 	return &BusinessLogic{
 		c:                c,
 		p:                p,
@@ -31,6 +34,7 @@ func New(c *BusinessLogicComponents, p *Processor, pollingPeriod, sendingPeriod,
 		pollingPeriod:    pollingPeriod,
 		sendingPeriod:    sendingPeriod,
 		processingPeriod: processingPeriod,
+		cfg:              cfg,
 	}
 }
 
@@ -113,6 +117,8 @@ func (b *BusinessLogic) mainLoop() error {
 }
 
 func (b *BusinessLogic) pollSensors() {
+	fmt.Println("+ pollSensors started")
+	defer fmt.Println("+ pollSensors exited")
 	var t float64
 	var err error
 	var s state
@@ -180,12 +186,16 @@ func (b *BusinessLogic) pollSensors() {
 }
 
 func (b *BusinessLogic) sendState() {
+	fmt.Println("+ SendState started")
+	defer fmt.Println("+ SendState exited")
+
 	var s state
 	b.stateMux.Lock()
 	s = b.state
 	b.stateMux.Unlock()
 
-	url := "https://api.thingspeak.com/update?api_key=TL9W7QIEFKFIYIS7"
+	url := fmt.Sprintf("%s://%s/%s?api_key=%s", b.cfg.Consumer.Schema, b.cfg.Consumer.Address, b.cfg.Consumer.URI, b.cfg.Consumer.APIKeys)
+
 	if s.KitchenTempValid {
 		url += "&field1=" + urltools.QueryEscape(fmt.Sprintf("%f", s.KitchenTemp))
 	}
@@ -234,6 +244,8 @@ func (b *BusinessLogic) sendState() {
 }
 
 func (b *BusinessLogic) processState() {
+	fmt.Println("+ processState started")
+	defer fmt.Println("+ processState exited")
 	b.stateMux.Lock()
 	s := b.state
 	b.stateMux.Unlock()

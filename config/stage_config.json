@@ -1,0 +1,26 @@
+{
+    "business_logic":{
+        "consumer":{
+            "enabled": true,
+            "api_keys":"KKZQQ8A7QK95DDCR",
+            "address":"api.thingspeak.com",
+            "schema":"https",
+            "uri":"update"
+        }
+    },
+    "watchdog":{
+        "watch_inet": false,
+        "inet_period_long": 1800,
+        "inet_period_short": 300,
+        "watch_vpn": false,
+        "vpn_svc_name": "openvpn",
+        "vpn_period_long": 300,
+        "vpn_period_short": 300
+    },
+    "weather_provider":{
+        "enabled":false
+    },
+    "forecast_provider":{
+        "enabled":false
+    } 
+}

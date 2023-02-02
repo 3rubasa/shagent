@@ -12,12 +12,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/3rubasa/shagent/config"
 	"github.com/procyon-projects/chrono"
 )
 
 const invalidTemperature = -100
 
 type ForecastProvider struct {
+	cfg               *config.ForecastProviderConfig
 	key               string
 	city              string
 	country           string
@@ -31,8 +33,9 @@ type ForecastProvider struct {
 	mux               *sync.Mutex
 }
 
-func New(key, city, country string, firstPeriod, mainPeriod, cacheTTL time.Duration) *ForecastProvider {
+func New(cfg *config.ForecastProviderConfig, key, city, country string, firstPeriod, mainPeriod, cacheTTL time.Duration) *ForecastProvider {
 	return &ForecastProvider{
+		cfg:               cfg,
 		key:               key,
 		city:              city,
 		country:           country,
@@ -46,6 +49,11 @@ func New(key, city, country string, firstPeriod, mainPeriod, cacheTTL time.Durat
 }
 
 func (cw *ForecastProvider) Start() error {
+	if !cw.cfg.Enabled {
+		fmt.Println("Forecast Provider is Disabled")
+		return nil
+	}
+
 	var err error
 	cw.scheduler = chrono.NewDefaultTaskScheduler()
 	cw.task, err = cw.scheduler.ScheduleAtFixedRate(cw.updateTemperature, cw.mainPeriod, chrono.WithTime(time.Now().Add(cw.firstPeriod)))

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 
 	//"os"
 	//"syscall"
@@ -17,6 +19,7 @@ import (
 	simplerelay "github.com/3rubasa/shagent/businesslogic/controllers/relay/simple"
 	"github.com/3rubasa/shagent/businesslogic/controllers/temperature"
 	"github.com/3rubasa/shagent/businesslogic/controllers/weatherprovider"
+	"github.com/3rubasa/shagent/config"
 	"github.com/3rubasa/shagent/drivers/ltemodule"
 	"github.com/3rubasa/shagent/drivers/ltemodule/sim7600"
 	"github.com/3rubasa/shagent/drivers/power/gpiopowersensor"
@@ -29,8 +32,23 @@ import (
 	"github.com/3rubasa/shagent/webserver"
 )
 
+const configPath = "./shagent.json"
+
 func main() {
 	var err error
+
+	cfgFile, err := os.Open(configPath)
+	if err != nil {
+		fmt.Println("Failed to open config file: ", err)
+		return
+	}
+
+	var cfg *config.Config
+	err = json.NewDecoder(cfgFile).Decode(&cfg)
+	if err != nil {
+		fmt.Println("Failed to read config file: ", err)
+		return
+	}
 
 	// Common
 	osservices := osservices.NewOSServicesProvider()
@@ -90,11 +108,11 @@ func main() {
 	outdoorsTempController := temperature.New(outdoorsTempSensorDrv, 10*time.Minute, time.Minute)
 
 	// 6.4 - Weather Temperature
-	weatherTempProvider := weatherprovider.New("5e9e1159073f45d7a7063db8891c82b0", "stebnyk", "ua", time.Minute, 45*time.Minute, 95*time.Minute)
+	weatherTempProvider := weatherprovider.New(&cfg.WeatherProvider, "5e9e1159073f45d7a7063db8891c82b0", "stebnyk", "ua", time.Minute, 45*time.Minute, 95*time.Minute)
 
 	// 6.5 - Forecast Provider
 	// 6.4 - Weather Temperature
-	forecastTempProvider := forecastprovider.New("5e9e1159073f45d7a7063db8891c82b0", "stebnyk", "ua", time.Minute, 4*time.Hour, 9*time.Hour)
+	forecastTempProvider := forecastprovider.New(&cfg.ForecastProvider, "5e9e1159073f45d7a7063db8891c82b0", "stebnyk", "ua", time.Minute, 4*time.Hour, 9*time.Hour)
 
 	// 7 - LTEModule
 	sim7600Drv := sim7600.New("/dev/ttyUSB2", 20*time.Second)
@@ -147,7 +165,7 @@ func main() {
 	processor := businesslogic.NewProcessor(businessRules, blComponents)
 
 	// 8 - Business logic
-	bl := businesslogic.New(blComponents, processor, 5*time.Minute, 2*time.Minute, 5*time.Minute)
+	bl := businesslogic.New(&cfg.BusinessLogic, blComponents, processor, 5*time.Minute, 2*time.Minute, 5*time.Minute)
 	bl.Start()
 
 	// 9 - webserver
