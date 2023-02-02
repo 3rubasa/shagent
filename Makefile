@@ -1,5 +1,6 @@
 .PHONY: default all
 
+stage: build_raspi deploy_local
 vpn: build_raspi deploy_vpn
 local: build_raspi deploy_local
 default: build deploy
