@@ -8,6 +8,7 @@ Restart=always
 RestartSec=1
 User=root
 ExecStart=/home/dima/go/src/shagent/bin/shagent
+WorkingDirectory=/home/dima/go/src/shagent/bin
 
 [Install]
 WantedBy=multi-user.target
