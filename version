@@ -1,1 +1,4 @@
+1.2 
+    - watchdog and osservices moved out of shagent
+    - binary moved to /opt/shagent
 1.1 - Configs added
