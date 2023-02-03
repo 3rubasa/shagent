@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
 
 	//"os"
 	//"syscall"
@@ -37,16 +35,9 @@ const configPath = "./shagent.json"
 func main() {
 	var err error
 
-	cfgFile, err := os.Open(configPath)
+	cfg, err := config.ReadFromFile(configPath)
 	if err != nil {
-		fmt.Println("Failed to open config file: ", err)
-		return
-	}
-
-	var cfg *config.Config
-	err = json.NewDecoder(cfgFile).Decode(&cfg)
-	if err != nil {
-		fmt.Println("Failed to read config file: ", err)
+		fmt.Println("Failed to get config: ", err)
 		return
 	}
 
@@ -54,8 +45,8 @@ func main() {
 	osservices := osservices.NewOSServicesProvider()
 
 	// 1 - watchdog DONE
-	inetchecker := watchdog.NewInternetChecker("http://google.com")
-	wd := watchdog.New(osservices, inetchecker, 20*time.Minute, 5*time.Minute, 5*time.Minute)
+	inetchecker := watchdog.NewInternetChecker(&cfg.Watchdog.InetChecker)
+	wd := watchdog.New(&cfg.Watchdog, osservices, inetchecker)
 	wd.Start()
 
 	// 2 - boiler DONE

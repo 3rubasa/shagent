@@ -11,6 +11,8 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/3rubasa/shagent/config"
 )
 
 type InternetChecker interface {
@@ -18,6 +20,7 @@ type InternetChecker interface {
 }
 
 type Watchdog struct {
+	cfg               *config.WatchdogConfig
 	vpnTicker         *time.Ticker
 	vpnPeriod         time.Duration
 	inetTicker        *time.Ticker
@@ -29,8 +32,13 @@ type Watchdog struct {
 	inetchecker       InternetChecker
 }
 
-func New(osservices OSServicesProvider, inetchecker InternetChecker, inetPeriod, inetPeriodOnError, vpnPeriod time.Duration) *Watchdog {
+func New(cfg *config.WatchdogConfig, osservices OSServicesProvider, inetchecker InternetChecker) *Watchdog {
+	inetPeriod := time.Duration(int64(cfg.InetChecker.LongPeriod) * int64(time.Second))
+	inetPeriodOnError := time.Duration(int64(cfg.InetChecker.ShortPeriod) * int64(time.Second))
+	vpnPeriod := time.Duration(int64(cfg.VPNChecker.LongPeriod) * int64(time.Second))
+
 	return &Watchdog{
+		cfg:               cfg,
 		done:              make(chan bool),
 		osservices:        osservices,
 		inetchecker:       inetchecker,
@@ -41,8 +49,21 @@ func New(osservices OSServicesProvider, inetchecker InternetChecker, inetPeriod,
 }
 
 func (p *Watchdog) Start() error {
-	p.inetTicker = time.NewTicker(p.inetPeriod)
-	p.vpnTicker = time.NewTicker(p.vpnPeriod)
+	p.inetTicker = time.NewTicker(500 * time.Hour)
+	if p.cfg.InetChecker.Enabled {
+		p.inetTicker.Reset(p.inetPeriod)
+	} else {
+		p.inetTicker.Stop()
+		fmt.Println("Watchdog: InetChecker is disabled in config")
+	}
+
+	p.vpnTicker = time.NewTicker(500 * time.Hour)
+	if p.cfg.VPNChecker.Enabled {
+		p.vpnTicker.Reset(p.vpnPeriod)
+	} else {
+		p.vpnTicker.Stop()
+		fmt.Println("Watchdog: VPNChecker is disabled in config")
+	}
 
 	go func() {
 		for {
@@ -141,7 +162,7 @@ func (p *Watchdog) restartVPNService() error {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
-	command := "sudo systemctl restart openvpn"
+	command := fmt.Sprintf("sudo systemctl restart %s", p.cfg.VPNChecker.SvcName)
 	cmd := exec.Command("bash", "-c", command)
 
 	cmd.Stdout = &stdout

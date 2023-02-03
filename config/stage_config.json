@@ -9,13 +9,17 @@
         }
     },
     "watchdog":{
-        "watch_inet": false,
-        "inet_period_long": 1800,
-        "inet_period_short": 300,
-        "watch_vpn": false,
-        "vpn_svc_name": "openvpn",
-        "vpn_period_long": 300,
-        "vpn_period_short": 300
+        "inet_checker": {
+            "enabled": true,
+            "url":"http://google.com",
+            "long_period": 1800,
+            "short_period": 300
+        },
+        "vpn_checker": {
+            "enabled": false,
+            "svc_name": "openvpn",
+            "long_period": 300
+        }
     },
     "weather_provider":{
         "enabled":false

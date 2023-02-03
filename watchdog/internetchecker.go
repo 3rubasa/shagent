@@ -4,22 +4,24 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/3rubasa/shagent/config"
 )
 
 type InternetCheckerImpl struct {
-	url string
+	cfg *config.InetCheckerConfig
 }
 
-func NewInternetChecker(url string) *InternetCheckerImpl {
+func NewInternetChecker(cfg *config.InetCheckerConfig) *InternetCheckerImpl {
 	return &InternetCheckerImpl{
-		url: url,
+		cfg: cfg,
 	}
 }
 
 func (ic *InternetCheckerImpl) IsInternetAvailable() (bool, error) {
-	fmt.Printf("About to send request to check if Internet is available: %s \n", ic.url)
+	fmt.Printf("About to send request to check if Internet is available: %s \n", ic.cfg.URL)
 
-	req, err := http.NewRequest(http.MethodGet, ic.url, nil)
+	req, err := http.NewRequest(http.MethodGet, ic.cfg.URL, nil)
 	if err != nil {
 		fmt.Printf("Error while creating request: %s \n", err.Error())
 		return false, err

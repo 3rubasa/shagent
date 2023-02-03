@@ -1,16 +1,34 @@
 package watchdog
 
 import (
+	"encoding/json"
 	"errors"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/3rubasa/shagent/config"
 	"github.com/3rubasa/shagent/watchdog/mockinternetchecker"
 	"github.com/3rubasa/shagent/watchdog/mockosservicesprovider"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
+
+var conf string = `{
+	"inet_checker": {
+		"enabled": true,
+		"url":"http://google.com",
+		"long_period": 1,
+		"short_period": 1
+	},
+	"vpn_checker": {
+		"enabled": false,
+		"svc_name": "openvpn",
+		"long_period": 1,
+		"short_period": 300
+	}
+}`
 
 func Test_InetNotAvail(t *testing.T) {
 	if os.Getenv("SH_RUN_ALL_TESTS") != "1" {
@@ -22,17 +40,20 @@ func Test_InetNotAvail(t *testing.T) {
 
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	inetChecker := mockinternetchecker.NewMockInternetChecker(mockCtrl)
-	inetPeriod := 200 * time.Millisecond
 
-	wd := New(osSvcs, inetChecker, inetPeriod, inetPeriod, 500*time.Hour)
+	var cfg *config.WatchdogConfig
+	err := json.NewDecoder(strings.NewReader(conf)).Decode(&cfg)
+	assert.NoError(t, err)
+
+	wd := New(cfg, osSvcs, inetChecker)
 
 	inetChecker.EXPECT().IsInternetAvailable().Return(false, nil).Times(3)
 	osSvcs.EXPECT().Reboot().Return(nil).Times(1)
 
-	err := wd.Start()
+	err = wd.Start()
 	assert.NoError(t, err)
 
-	time.Sleep(time.Second)
+	time.Sleep(5 * time.Second)
 }
 
 func Test_InetAvail(t *testing.T) {
@@ -45,17 +66,20 @@ func Test_InetAvail(t *testing.T) {
 
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	inetChecker := mockinternetchecker.NewMockInternetChecker(mockCtrl)
-	period := 200 * time.Millisecond
 
-	wd := New(osSvcs, inetChecker, period, period, 500*time.Hour)
+	var cfg *config.WatchdogConfig
+	err := json.NewDecoder(strings.NewReader(conf)).Decode(&cfg)
+	assert.NoError(t, err)
+
+	wd := New(cfg, osSvcs, inetChecker)
 
 	inetChecker.EXPECT().IsInternetAvailable().Return(true, nil).MinTimes(1)
 	osSvcs.EXPECT().Reboot().Return(nil).Times(0)
 
-	err := wd.Start()
+	err = wd.Start()
 	assert.NoError(t, err)
 
-	time.Sleep(time.Second)
+	time.Sleep(5 * time.Second)
 }
 
 func Test_InetAvail_Error(t *testing.T) {
@@ -68,17 +92,20 @@ func Test_InetAvail_Error(t *testing.T) {
 
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	inetChecker := mockinternetchecker.NewMockInternetChecker(mockCtrl)
-	period := 200 * time.Millisecond
 
-	wd := New(osSvcs, inetChecker, period, period, 500*time.Hour)
+	var cfg *config.WatchdogConfig
+	err := json.NewDecoder(strings.NewReader(conf)).Decode(&cfg)
+	assert.NoError(t, err)
+
+	wd := New(cfg, osSvcs, inetChecker)
 
 	inetChecker.EXPECT().IsInternetAvailable().Return(true, errors.New("dummy error")).Times(1)
 	osSvcs.EXPECT().Reboot().Return(nil).Times(1)
 
-	err := wd.Start()
+	err = wd.Start()
 	assert.NoError(t, err)
 
-	time.Sleep(time.Second)
+	time.Sleep(5 * time.Second)
 }
 
 func Test_InetAvail_Intermittent(t *testing.T) {
@@ -91,9 +118,12 @@ func Test_InetAvail_Intermittent(t *testing.T) {
 
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	inetChecker := mockinternetchecker.NewMockInternetChecker(mockCtrl)
-	period := 200 * time.Millisecond
 
-	wd := New(osSvcs, inetChecker, period, period, 500*time.Hour)
+	var cfg *config.WatchdogConfig
+	err := json.NewDecoder(strings.NewReader(conf)).Decode(&cfg)
+	assert.NoError(t, err)
+
+	wd := New(cfg, osSvcs, inetChecker)
 
 	counter := 0
 
@@ -124,8 +154,8 @@ func Test_InetAvail_Intermittent(t *testing.T) {
 
 	osSvcs.EXPECT().Reboot().Return(nil).Times(1)
 
-	err := wd.Start()
+	err = wd.Start()
 	assert.NoError(t, err)
 
-	time.Sleep(2 * time.Second)
+	time.Sleep(10 * time.Second)
 }
