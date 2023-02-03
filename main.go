@@ -9,6 +9,7 @@ import (
 
 	//"bitbucket.org/gmcbay/i2c"
 
+	"github.com/3rubasa/osservices"
 	"github.com/3rubasa/shagent/businesslogic"
 	"github.com/3rubasa/shagent/businesslogic/controllers/forecastprovider"
 	"github.com/3rubasa/shagent/businesslogic/controllers/ltemodulecontroller"
@@ -25,8 +26,6 @@ import (
 	"github.com/3rubasa/shagent/drivers/relay/sonoffr3rf"
 	"github.com/3rubasa/shagent/drivers/relay/wsraspihatx3"
 	"github.com/3rubasa/shagent/drivers/termo/dht22"
-	"github.com/3rubasa/shagent/osservices"
-	"github.com/3rubasa/shagent/watchdog"
 	"github.com/3rubasa/shagent/webserver"
 )
 
@@ -43,11 +42,6 @@ func main() {
 
 	// Common
 	osservices := osservices.NewOSServicesProvider()
-
-	// 1 - watchdog DONE
-	inetchecker := watchdog.NewInternetChecker(&cfg.Watchdog.InetChecker)
-	wd := watchdog.New(&cfg.Watchdog, osservices, inetchecker)
-	wd.Start()
 
 	// 2 - boiler DONE
 	sonoffr3rfRelayDrv := sonoffr3rf.New(osservices, "24:a1:60:1d:72:9d")

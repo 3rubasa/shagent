@@ -22,11 +22,8 @@ deploy_config_vpn:
 start_svc_vpn:
 	plink -pw p dima@172.27.208.8 "sudo systemctl start shagent.service"
 
-deploy_vpn:
-	plink -pw p dima@172.27.208.8 "sudo systemctl stop shagent.service" && pscp -pw p ./bin/shagent dima@172.27.208.8:/home/dima/go/src/shagent/bin/shagent && pscp -pw p ./config/prod_config.json dima@10.42.0.1:/home/dima/go/src/shagent/bin/shagent.json && plink -pw p dima@172.27.208.8 "sudo systemctl start shagent.service"
-
 deploy_local:
-	plink -pw p dima@10.42.0.1 "sudo systemctl stop shagent.service" && pscp -pw p ./bin/shagent dima@10.42.0.1:/home/dima/go/src/shagent/bin/shagent && pscp -pw p ./config/stage_config.json dima@10.42.0.1:/home/dima/go/src/shagent/bin/shagent.json && plink -pw p dima@10.42.0.1 "sudo systemctl start shagent.service"
+	plink -pw p dima@10.42.0.1 "sudo systemctl stop shagent.service" && pscp -pw p ./bin/shagent dima@10.42.0.1:/opt/shagent/shagent && pscp -pw p ./config/stage_config.json dima@10.42.0.1:/opt/shagent/shagent.json && plink -pw p dima@10.42.0.1 "sudo systemctl start shagent.service"
 
 codegen:
 	go env -w GOOS=linux && go env -w GOARCH=amd64 && go generate ./...

@@ -12,6 +12,7 @@ require (
 )
 
 require (
+	github.com/3rubasa/osservices v0.0.0-20230203114950-ea8b84ba826c // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/term v1.1.0 // indirect
