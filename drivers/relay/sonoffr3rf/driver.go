@@ -37,9 +37,8 @@ func (d Driver) GetState() (string, error) {
 	reqBody := strings.NewReader(relayInfoBody)
 
 	log.Println("Debug: About to send http request to relay: ", url)
-	// TODO: change to milliseconds
 	// Enforce delay - switch can process one request per 200 ms
-	time.Sleep(200 * time.Microsecond)
+	time.Sleep(200 * time.Millisecond)
 
 	req, err := http.NewRequest(http.MethodPost, url, reqBody)
 	if err != nil {
@@ -83,9 +82,6 @@ func (d Driver) GetState() (string, error) {
 }
 
 func (a Driver) TurnOn() error {
-	// Enforce delay - switch can process one request per 200 ms
-	time.Sleep(200 * time.Microsecond)
-
 	ip, err := a.osSvcs.GetIPFromMAC(a.macAddr)
 	if err != nil {
 		fmt.Println("Failed to get relay IP address: ", err)
@@ -93,9 +89,12 @@ func (a Driver) TurnOn() error {
 	}
 
 	url := fmt.Sprintf("http://%s:%d/%s", ip, relayPort, relaySwitchPath)
-	fmt.Printf("About to send http request to relay: %s \n", url)
 
 	reqBody := strings.NewReader(relaySwitchOnBody)
+
+	fmt.Printf("About to send http request to relay: %s \n", url)
+	// Enforce delay - switch can process one request per 200 ms
+	time.Sleep(200 * time.Millisecond)
 	req, err := http.NewRequest(http.MethodPost, url, reqBody)
 	if err != nil {
 		fmt.Printf("Error while creating request: %s \n", err.Error())
@@ -135,9 +134,6 @@ func (a Driver) TurnOn() error {
 }
 
 func (a Driver) TurnOff() error {
-	// Enforce delay - switch can process one request per 200 ms
-	time.Sleep(200 * time.Microsecond)
-
 	ip, err := a.osSvcs.GetIPFromMAC(a.macAddr)
 	if err != nil {
 		fmt.Println("Failed to get relay IP address: ", err)
@@ -145,9 +141,12 @@ func (a Driver) TurnOff() error {
 	}
 
 	url := fmt.Sprintf("http://%s:%d/%s", ip, relayPort, relaySwitchPath)
-	fmt.Printf("About to send http request to relay: %s \n", url)
 
 	reqBody := strings.NewReader(relaySwitchOffBody)
+
+	fmt.Printf("About to send http request to relay: %s \n", url)
+	// Enforce delay - switch can process one request per 200 ms
+	time.Sleep(200 * time.Millisecond)
 	req, err := http.NewRequest(http.MethodPost, url, reqBody)
 	if err != nil {
 		fmt.Printf("Error while creating request: %s \n", err.Error())
