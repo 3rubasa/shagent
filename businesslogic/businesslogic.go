@@ -123,6 +123,15 @@ func (b *BusinessLogic) pollSensors() {
 	var err error
 	var s state
 
+	// RoomLight
+	rl, err := b.c.RoomLight.Get()
+	if err != nil {
+		fmt.Println("Failed to get room light state: ", err)
+	} else {
+		s.RoomLightState = rl
+		s.RoomLightStateValid = true
+	}
+
 	t, err = b.c.KitchenTemp.Get()
 	if err != nil {
 		fmt.Println("Error while getting kitchen temperature: ", err)
@@ -216,6 +225,9 @@ func (b *BusinessLogic) sendState() {
 	}
 	if s.ForecastedTempValid {
 		url += "&field7=" + urltools.QueryEscape(fmt.Sprintf("%f", s.ForecastedTemp))
+	}
+	if s.RoomLightStateValid {
+		url += "&field8=" + urltools.QueryEscape(fmt.Sprintf("%d", s.RoomLightState))
 	}
 
 	fmt.Printf("About to send request: %s \n", url)
