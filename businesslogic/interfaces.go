@@ -3,6 +3,7 @@ package businesslogic
 type RoomLightController interface {
 	Start() error
 	Stop() error
+	Get() (int, error)
 }
 
 type TempSensorController interface {

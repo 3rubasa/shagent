@@ -38,18 +38,21 @@ func Test_TurnOn_FirstTime(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	devAPI := mockdeviceapi.NewMockDeviceAPI(mockCtrl)
-	s := New(devAPI, 200*time.Millisecond)
+	s := New(devAPI, 5*time.Second)
 
-	devAPI.EXPECT().GetState().Return("on", nil).AnyTimes()
+	devAPI.EXPECT().GetState().Return("off", nil).Times(1)
 	devAPI.EXPECT().TurnOn().Return(nil).Times(1)
 
 	err := s.Start()
-	defer s.Stop()
 
 	assert.NoError(t, err)
 
 	err = s.TurnOn()
 	assert.NoError(t, err)
+
+	time.Sleep(time.Second)
+
+	s.Stop()
 }
 
 func Test_TurnOn_SecondTime(t *testing.T) {
@@ -61,17 +64,18 @@ func Test_TurnOn_SecondTime(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	devAPI := mockdeviceapi.NewMockDeviceAPI(mockCtrl)
-	s := New(devAPI, 200*time.Millisecond)
+	s := New(devAPI, 800*time.Millisecond)
 
 	tryNum := 0
 
 	devAPI.EXPECT().GetState().DoAndReturn(func() (string, error) {
-		if tryNum == 1 {
-			return "off", nil
-		} else {
+		if tryNum > 1 {
 			return "on", nil
+		} else {
+			return "off", nil
 		}
-	}).AnyTimes()
+
+	}).Times(3)
 
 	devAPI.EXPECT().TurnOn().DoAndReturn(func() error {
 		tryNum++
@@ -91,9 +95,9 @@ func Test_TurnOn_SecondTime(t *testing.T) {
 	assert.NoError(t, err)
 
 	err = s.TurnOn()
-	assert.Error(t, err)
+	assert.NoError(t, err)
 
-	time.Sleep(time.Second)
+	time.Sleep(2 * time.Second)
 }
 
 func Test_TurnOff_FirstTime(t *testing.T) {
@@ -101,18 +105,21 @@ func Test_TurnOff_FirstTime(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	devAPI := mockdeviceapi.NewMockDeviceAPI(mockCtrl)
-	s := New(devAPI, 200*time.Millisecond)
+	s := New(devAPI, 5*time.Second)
 
-	devAPI.EXPECT().GetState().Return("off", nil).AnyTimes()
+	devAPI.EXPECT().GetState().Return("on", nil).Times(1)
 	devAPI.EXPECT().TurnOff().Return(nil).Times(1)
 
 	err := s.Start()
-	defer s.Stop()
 
 	assert.NoError(t, err)
 
 	err = s.TurnOff()
 	assert.NoError(t, err)
+
+	time.Sleep(time.Second)
+
+	s.Stop()
 }
 
 func Test_TurnOff_SecondTime(t *testing.T) {
@@ -124,17 +131,18 @@ func Test_TurnOff_SecondTime(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	devAPI := mockdeviceapi.NewMockDeviceAPI(mockCtrl)
-	s := New(devAPI, 200*time.Millisecond)
+	s := New(devAPI, 800*time.Millisecond)
 
 	tryNum := 0
 
 	devAPI.EXPECT().GetState().DoAndReturn(func() (string, error) {
-		if tryNum == 1 {
-			return "on", nil
-		} else {
+		if tryNum > 1 {
 			return "off", nil
+		} else {
+			return "on", nil
 		}
-	}).AnyTimes()
+
+	}).Times(3)
 
 	devAPI.EXPECT().TurnOff().DoAndReturn(func() error {
 		tryNum++
@@ -154,7 +162,7 @@ func Test_TurnOff_SecondTime(t *testing.T) {
 	assert.NoError(t, err)
 
 	err = s.TurnOff()
-	assert.Error(t, err)
+	assert.NoError(t, err)
 
-	time.Sleep(time.Second)
+	time.Sleep(2 * time.Second)
 }
