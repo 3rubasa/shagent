@@ -1,21 +1,20 @@
 package wsraspihatx3
 
 import (
-	"errors"
-	"fmt"
+	"log"
 
 	"github.com/stianeikeland/go-rpio"
 )
 
-type API struct {
+type Driver struct {
 	channel RelayChannel
 	pin     rpio.Pin
 }
 
-func New(channel RelayChannel) (*API, error) {
+func New(channel RelayChannel) (*Driver, error) {
 	err := rpio.Open()
 	if err != nil {
-		fmt.Printf("Failed to open rpio: %s \n", err.Error())
+		log.Println("ERROR: Failed to open rpio device: ", err)
 		return nil, err
 	}
 
@@ -23,13 +22,13 @@ func New(channel RelayChannel) (*API, error) {
 	pin.Output()
 	pin.High()
 
-	return &API{
+	return &Driver{
 		channel: channel,
 		pin:     pin,
 	}, nil
 }
 
-func (a API) GetState() (string, error) {
+func (a Driver) GetState() (string, error) {
 	s := a.pin.Read()
 
 	switch s {
@@ -38,16 +37,17 @@ func (a API) GetState() (string, error) {
 	case rpio.Low:
 		return "on", nil
 	default:
-		return "", errors.New("unexpected gpio state")
+		log.Panicln("ERROR: unexpected gpio state: ", s)
+		return "", nil
 	}
 }
 
-func (a API) TurnOn() error {
+func (a Driver) TurnOn() error {
 	a.pin.Low()
 	return nil
 }
 
-func (a API) TurnOff() error {
+func (a Driver) TurnOff() error {
 	a.pin.High()
 	return nil
 }
