@@ -10,6 +10,7 @@ type Relay struct {
 	targetState RelayState // "on", "off" or "neutral"
 	ticker      *time.Ticker
 	done        chan bool
+	job         chan bool
 	mux         *sync.Mutex
 	period      time.Duration
 	deviceAPI   DeviceAPI
@@ -19,6 +20,7 @@ func New(deviceAPI DeviceAPI, period time.Duration) *Relay {
 	return &Relay{
 		targetState: relayStateNeutral,
 		done:        make(chan bool),
+		job:         make(chan bool, 1),
 		mux:         &sync.Mutex{},
 		period:      period,
 		deviceAPI:   deviceAPI,
@@ -42,22 +44,24 @@ func (p *Relay) GetState() (string, error) {
 
 func (p *Relay) TurnOn() error {
 	p.mux.Lock()
-	defer p.mux.Unlock()
-
 	p.targetState = relayStateOn
+	if len(p.job) == 0 {
+		p.job <- true
+	}
+	p.mux.Unlock()
 
-	// Try once to set the state synchronously
-	return p.deviceAPI.TurnOn()
+	return nil
 }
 
 func (p *Relay) TurnOff() error {
 	p.mux.Lock()
-	defer p.mux.Unlock()
-
 	p.targetState = relayStateOff
+	if len(p.job) == 0 {
+		p.job <- true
+	}
+	p.mux.Unlock()
 
-	// Try once to set the state synchronously
-	return p.deviceAPI.TurnOff()
+	return nil
 }
 
 func (p *Relay) mainLoop() {
@@ -66,16 +70,23 @@ func (p *Relay) mainLoop() {
 		case <-p.done:
 			return
 		case <-p.ticker.C:
-			p.onTicker()
+			p.mux.Lock()
+			if len(p.job) == 0 {
+				p.job <- true
+			}
+			p.mux.Unlock()
+		case <-p.job:
+			p.onNewJob()
 		}
 	}
 }
 
-func (p *Relay) onTicker() {
+func (p *Relay) onNewJob() {
 	p.mux.Lock()
-	defer p.mux.Unlock()
+	ts := p.targetState
+	p.mux.Unlock()
 
-	fmt.Println("OnTickerEvent")
+	fmt.Println("OnNewJob")
 	// Get current state
 	csStr, err := p.GetState()
 	if err != nil {
@@ -89,14 +100,12 @@ func (p *Relay) onTicker() {
 		return
 	}
 
-	fmt.Printf("Boiler's current state is %d, target state is %d", cs, p.targetState)
+	fmt.Printf("Boiler's current state is %d, target state is %d", cs, ts)
 
 	// Compare it with target state
-	if cs == p.targetState {
+	if cs == ts {
 		return
 	}
-
-	ts := p.targetState
 
 	// Apply target state if it is different from the current one
 	switch ts {
@@ -117,7 +126,6 @@ func (p *Relay) onTicker() {
 	case relayStateNeutral:
 		// Do nothing
 	default:
-		fmt.Printf("Error! Unexpected target state for boiler: %d\n", p.targetState)
+		fmt.Printf("Error! Unexpected target state for boiler: %d\n", ts)
 	}
 }
- 
