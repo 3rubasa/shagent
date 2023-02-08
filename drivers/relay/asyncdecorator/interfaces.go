@@ -1,4 +1,4 @@
-package relay
+package asyncdecorator
 
 type DeviceAPI interface {
 	GetState() (string, error)

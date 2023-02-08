@@ -1,7 +1,5 @@
 github.com/3rubasa/go-dht v1.0.1 h1:tJK6+sXwNv2RjhE1yvZtB3xaUMpHzCvwNnz7IRm4GvA=
 github.com/3rubasa/go-dht v1.0.1/go.mod h1:tMrP/Edgiw0kzUNJxM05K43r5wkHHxFpa3dPX2VZQvg=
-github.com/3rubasa/osservices v0.0.0-20230203114950-ea8b84ba826c h1:3GpCqGvunosamSi60g+Vox+Z7Z19MIPIVnYoXpI2Mlg=
-github.com/3rubasa/osservices v0.0.0-20230203114950-ea8b84ba826c/go.mod h1:5rhD5+70C7IhC7nOLNMCy/1niKA+lP+BjCQHelbvm64=
 github.com/3rubasa/osservices v0.0.0-20230208102135-3b9a9e676e19 h1:JohuAPSxgynJ31qhmgSxAgvn07nOvOa0JvSDzT80TXQ=
 github.com/3rubasa/osservices v0.0.0-20230208102135-3b9a9e676e19/go.mod h1:5rhD5+70C7IhC7nOLNMCy/1niKA+lP+BjCQHelbvm64=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

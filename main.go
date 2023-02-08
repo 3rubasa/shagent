@@ -22,7 +22,7 @@ import (
 	"github.com/3rubasa/shagent/drivers/ltemodule"
 	"github.com/3rubasa/shagent/drivers/ltemodule/sim7600"
 	"github.com/3rubasa/shagent/drivers/power/gpiopowersensor"
-	"github.com/3rubasa/shagent/drivers/relay"
+	"github.com/3rubasa/shagent/drivers/relay/asyncdecorator"
 	"github.com/3rubasa/shagent/drivers/relay/sonoffr3rf"
 	"github.com/3rubasa/shagent/drivers/relay/wsraspihatx3"
 	"github.com/3rubasa/shagent/drivers/termo/dht22"
@@ -45,17 +45,14 @@ func main() {
 
 	// 2 - boiler DONE
 	sonoffr3rfRelayDrv := sonoffr3rf.New(osservices, "24:a1:60:1d:72:9d")
-	boilerRelayDrv := relay.New(sonoffr3rfRelayDrv, 10*time.Minute)
+	boilerRelayDrv := asyncdecorator.New(sonoffr3rfRelayDrv, 10*time.Minute)
 	boilerController := simplerelay.New(boilerRelayDrv)
 
 	// 3 - roomLight DONE
 	// TODO: Later, if roomLight is nil, what are we going to do?
-	var roomLightRelayDrv *relay.Relay
-	wsRelayForRoomLight, err := wsraspihatx3.New(wsraspihatx3.RelayChannel1)
+	roomLightRelayDrv, err := wsraspihatx3.New(wsraspihatx3.RelayChannel1)
 	if err != nil {
 		fmt.Println("Failed to create WaveShare Raspi Hat relay device: ", err)
-	} else {
-		roomLightRelayDrv = relay.New(wsRelayForRoomLight, 30*time.Minute)
 	}
 
 	var ontimes, offtimes []string
@@ -66,12 +63,9 @@ func main() {
 
 	// 4 - camLight DONE
 	// TODO: Later, if cam light is nil, what are we going to do?
-	var camLightRelayDrv *relay.Relay
-	wsRelayForCamLight, err := wsraspihatx3.New(wsraspihatx3.RelayChannel2)
+	camLightRelayDrv, err := wsraspihatx3.New(wsraspihatx3.RelayChannel2)
 	if err != nil {
 		fmt.Println("Failed to create WaveShare Raspi Hat relay device: ", err)
-	} else {
-		camLightRelayDrv = relay.New(wsRelayForCamLight, 30*time.Minute)
 	}
 
 	camLightController := simplerelay.New(camLightRelayDrv)

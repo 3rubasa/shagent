@@ -28,6 +28,14 @@ func New(channel RelayChannel) (*Driver, error) {
 	}, nil
 }
 
+func (a Driver) Start() error {
+	return nil
+}
+
+func (a Driver) Stop() {
+	return
+}
+
 func (a Driver) GetState() (string, error) {
 	s := a.pin.Read()
 

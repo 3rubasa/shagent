@@ -1,7 +1,7 @@
-package relay
+package asyncdecorator
 
 import (
-	"fmt"
+	"log"
 	"sync"
 	"time"
 )
@@ -86,21 +86,22 @@ func (p *Relay) onNewJob() {
 	ts := p.targetState
 	p.mux.Unlock()
 
-	fmt.Println("OnNewJob")
+	log.Println("Debug: Async Relay Decorator: OnNewJob()")
+
 	// Get current state
 	csStr, err := p.GetState()
 	if err != nil {
-		fmt.Printf("Failed to get current state: %s\n", err.Error())
+		log.Printf("NOTICE: Could not to get relay current state: %v", err)
 		return
 	}
 
 	cs, err := StringToRelayState(csStr)
 	if err != nil {
-		fmt.Printf("Failed to convert relay state from string: %s\n", err.Error())
+		log.Printf("ERROR: Failed to convert relay state from string: %v", err)
 		return
 	}
 
-	fmt.Printf("Boiler's current state is %d, target state is %d", cs, ts)
+	log.Printf("Debug: Async Relay's current state is %d, target state is %d", cs, ts)
 
 	// Compare it with target state
 	if cs == ts {
@@ -110,22 +111,24 @@ func (p *Relay) onNewJob() {
 	// Apply target state if it is different from the current one
 	switch ts {
 	case relayStateOn:
-		fmt.Printf("Trying to turn boiler on... \n")
+		log.Println("Debug: Async Relay Decorator: turning the relay on...")
 		err = p.deviceAPI.TurnOn()
 		if err != nil {
-			fmt.Printf("Failed to turn boiler on: %s\n", err.Error())
+			log.Printf("NOTICE: Could not turn the relay on: %v", err)
 			return
 		}
 	case relayStateOff:
-		fmt.Printf("Trying to turn boiler off... \n")
+		log.Println("Debug: Async Relay Decorator: turning the relay off...")
 		err = p.deviceAPI.TurnOff()
 		if err != nil {
-			fmt.Printf("Failed to turn boiler off: %s\n", err.Error())
+			log.Printf("NOTICE: Could not turn the relay off: %v", err)
 			return
 		}
 	case relayStateNeutral:
+		log.Println("Debug: Async Relay Decorator: skipping because target state is Neutral...")
 		// Do nothing
 	default:
-		fmt.Printf("Error! Unexpected target state for boiler: %d\n", ts)
+		log.Panicf("ERROR: Async Relay Decorator: Unexpected target state of the relay: %d", ts)
+		return
 	}
 }

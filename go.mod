@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/3rubasa/go-dht v1.0.1
+	github.com/3rubasa/osservices v0.0.0-20230208102135-3b9a9e676e19
 	github.com/golang/mock v1.6.0
 	github.com/procyon-projects/chrono v1.1.2
 	github.com/sitec-systems/gmodem v0.0.0-20170113084156-4ef99c9a7602
@@ -12,7 +13,6 @@ require (
 )
 
 require (
-	github.com/3rubasa/osservices v0.0.0-20230208102135-3b9a9e676e19 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/term v1.1.0 // indirect

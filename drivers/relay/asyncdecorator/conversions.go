@@ -1,4 +1,4 @@
-package relay
+package asyncdecorator
 
 import "fmt"
 
