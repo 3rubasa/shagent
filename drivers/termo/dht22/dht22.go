@@ -2,6 +2,7 @@ package dht22
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/3rubasa/go-dht"
 )
@@ -20,13 +21,13 @@ func New(Pin uint8) *Sensor {
 func (s *Sensor) Initialize() error {
 	err := dht.HostInit()
 	if err != nil {
-		fmt.Printf("Error in HostInit(): %s \n", err.Error())
+		log.Println("ERROR: Failed to initialize DHT sersor: ", err)
 		return err
 	}
 
 	s.dhtSensor, err = dht.NewDHT(fmt.Sprintf("GPIO%d", s.pin), dht.Celsius, sensorType)
 	if err != nil {
-		fmt.Printf("Error in NewDHT(): %s \n", err.Error())
+		log.Println("ERROR: Failed to instantiate DHT struct: ", err)
 		return err
 	}
 
@@ -36,8 +37,8 @@ func (s *Sensor) Initialize() error {
 func (s *Sensor) Get() (float64, error) {
 	_, t, err := s.dhtSensor.ReadRetry(maxRetries)
 	if err != nil {
-		fmt.Printf("Error while reading a sample: %s \n", err.Error())
-		return -273.15, err
+		log.Println("Debug: Failed to read DHT sensor data: ", err)
+		return 0.0, err
 	}
 
 	return t, nil
