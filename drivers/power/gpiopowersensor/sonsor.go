@@ -1,7 +1,7 @@
 package gpiopowersensor
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/stianeikeland/go-rpio"
 )
@@ -20,7 +20,7 @@ func New(gpioPin uint8) *Sensor {
 func (s *Sensor) Initialize() error {
 	err := rpio.Open()
 	if err != nil {
-		fmt.Printf("Failed to open rpio: %s \n", err.Error())
+		log.Println("ERROR: Failed to open rpio: ", err)
 		return err
 	}
 
