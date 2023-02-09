@@ -2,6 +2,7 @@ package sim7600
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/sitec-systems/gmodem"
@@ -27,13 +28,17 @@ func (s *Sim7600) SendUSSD(ussd string) (string, error) {
 
 	err := mdm.Open()
 	if err != nil {
+		log.Println("ERROR: failed to open modem: ", err)
 		return "", err
 	}
 	defer mdm.Close()
 
 	at := fmt.Sprintf("AT+CUSD=1,\"%s\",15", ussd)
+
+	log.Println("Debug: About to send AT command to modem: ", at)
 	r, err := mdm.SendAt(at)
 	if err != nil {
+		log.Println("NOTICE: Could not send AT command to 7600 modem: ", err)
 		return "", err
 	}
 
