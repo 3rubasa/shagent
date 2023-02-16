@@ -3,12 +3,13 @@
 production: build_raspi stop_svc_vpn deploy_agent_vpn deploy_config_vpn start_svc_vpn
 stage: build_raspi deploy_local
 default: build deploy
+stage_cli: build_cli_raspi deploy_cli_local
 
 build_linux_amd64:
-	go env -w GOOS=linux && go env -w GOARCH=amd64 && go build -o bin/shagent
+	go env -w GOOS=linux && go env -w GOARCH=amd64 && go build -o bin/shagent ./cmd/shagent/...
 
 build_raspi:
-	go env -w GOOS=linux && go env -w GOARCH=arm64 && go build -o bin/shagent
+	go env -w GOOS=linux && go env -w GOARCH=arm64 && go build -o bin/shagent ./cmd/shagent/...
 
 stop_svc_vpn:
 	plink -pw p dima@172.27.208.8 "sudo systemctl stop shagent.service"
@@ -36,3 +37,12 @@ test:
 
 proto:
 	protoc --go_out=./ --go_opt=paths=source_relative --go-grpc_out=./ --go-grpc_opt=paths=source_relative ./grpcapi/grpcapi.proto
+
+cli_linux_amd64:
+	go env -w GOOS=linux && go env -w GOARCH=amd64 && go build -o bin/shagent_cli ./cmd/cli/...
+
+build_cli_raspi:
+	go env -w GOOS=linux && go env -w GOARCH=arm64 && go build -o bin/shagent_cli ./cmd/cli/...
+
+deploy_cli_local:
+	pscp -pw p ./bin/shagent_cli dima@10.42.0.1:/opt/shagent/shagent_cli
