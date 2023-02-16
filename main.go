@@ -27,6 +27,7 @@ import (
 	"github.com/3rubasa/shagent/drivers/relay/sonoffr3rf"
 	"github.com/3rubasa/shagent/drivers/relay/wsraspihatx3"
 	"github.com/3rubasa/shagent/drivers/termo/dht22"
+	"github.com/3rubasa/shagent/grpcapi"
 	"github.com/3rubasa/shagent/webserver"
 )
 
@@ -169,6 +170,12 @@ func main() {
 	err = ws.Start()
 	if err != nil {
 		log.Println("ERROR: Failed to start the web server: ", err)
+	}
+
+	ga := grpcapi.New(bl, 50053)
+	err = ga.Start()
+	if err != nil {
+		log.Println("ERROR: Failed to start GRPC API: ", err)
 	}
 
 	log.Println("SERVICE INTIALIZATION COMPLETE")

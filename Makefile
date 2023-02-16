@@ -33,3 +33,6 @@ test_all:
 
 test:
 	env SH_RUN_ALL_TESTS=0 GOOS=linux GOARCH=amd64 go test -count=1 ./...
+
+proto:
+	protoc --go_out=./ --go_opt=paths=source_relative --go-grpc_out=./ --go-grpc_opt=paths=source_relative ./grpcapi/grpcapi.proto
