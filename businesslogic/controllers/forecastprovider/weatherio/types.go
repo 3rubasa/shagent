@@ -1,4 +1,4 @@
-package forecastprovider
+package weatherio
 
 type ForecastResponse struct {
 	City    string             `json:"city_name"`

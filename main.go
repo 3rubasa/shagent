@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	//"os"
 	//"syscall"
@@ -11,7 +12,7 @@ import (
 
 	"github.com/3rubasa/osservices"
 	"github.com/3rubasa/shagent/businesslogic"
-	"github.com/3rubasa/shagent/businesslogic/controllers/forecastprovider"
+	"github.com/3rubasa/shagent/businesslogic/controllers/forecastprovider/openweather"
 	"github.com/3rubasa/shagent/businesslogic/controllers/ltemodulecontroller"
 	"github.com/3rubasa/shagent/businesslogic/controllers/power"
 	scheduledrelay "github.com/3rubasa/shagent/businesslogic/controllers/relay/scheduled"
@@ -32,11 +33,13 @@ import (
 const configPath = "./shagent.json"
 
 func main() {
+	log.Println("Starting shagent...")
 	var err error
 
+	log.Println("Reading configuration from file ", configPath, " ...")
 	cfg, err := config.ReadFromFile(configPath)
 	if err != nil {
-		fmt.Println("Failed to get config: ", err)
+		log.Println("ERROR: Failed to get config: ", err)
 		return
 	}
 
@@ -52,7 +55,7 @@ func main() {
 	// TODO: Later, if roomLight is nil, what are we going to do?
 	roomLightRelayDrv, err := wsraspihatx3.New(wsraspihatx3.RelayChannel1)
 	if err != nil {
-		fmt.Println("Failed to create WaveShare Raspi Hat relay device: ", err)
+		log.Println("ERROR: Failed to create WaveShare Raspi Hat relay device: ", err)
 	}
 
 	var ontimes, offtimes []string
@@ -65,7 +68,7 @@ func main() {
 	// TODO: Later, if cam light is nil, what are we going to do?
 	camLightRelayDrv, err := wsraspihatx3.New(wsraspihatx3.RelayChannel2)
 	if err != nil {
-		fmt.Println("Failed to create WaveShare Raspi Hat relay device: ", err)
+		fmt.Println("ERROR: Failed to create WaveShare Raspi Hat relay device: ", err)
 	}
 
 	camLightController := simplerelay.New(camLightRelayDrv)
@@ -91,7 +94,7 @@ func main() {
 
 	// 6.5 - Forecast Provider
 	// 6.4 - Weather Temperature
-	forecastTempProvider := forecastprovider.New(&cfg.ForecastProvider, "5e9e1159073f45d7a7063db8891c82b0", "stebnyk", "ua", time.Minute, 4*time.Hour, 9*time.Hour)
+	forecastTempProvider := openweather.New(&cfg.ForecastProvider, "3c49c423e46752496919cbef4186df81", "stebnyk", "ua", time.Minute, 30*time.Minute, 3*time.Hour)
 
 	// 7 - LTEModule
 	sim7600Drv := sim7600.New("/dev/ttyUSB2", 20*time.Second)
@@ -160,15 +163,15 @@ func main() {
 	ws := webserver.New(components, 8888)
 	err = ws.Initialize()
 	if err != nil {
-		fmt.Println("Failed to initialize the web server: ", err)
-		return
+		log.Println("ERROR: Failed to initialize the web server: ", err)
 	}
 
 	err = ws.Start()
 	if err != nil {
-		fmt.Println("Failed to start the web server: ", err)
-		return
+		log.Println("ERROR: Failed to start the web server: ", err)
 	}
+
+	log.Println("SERVICE INTIALIZATION COMPLETE")
 
 	// TODO
 	time.Sleep(1000 * time.Hour)

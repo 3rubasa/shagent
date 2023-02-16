@@ -1,0 +1,29 @@
+1. GPIO2 must be High at start-up and it is, so leave it open
+2. GPIO0 decides normal boot/flash mode. High (default) is normal boot, so nothin need to be done for normal boot. For flash mode - pull-down the pin to GND with 10K resistor
+3. GPIO15 must be Pulled-Down to GND with 10K resistor (adapter already does this)
+4. CH_PD must be Pulled-UP to VCC with 10K resistor (adapter already does this)
+5. GPIO16 must be connected to RST with 470R (or 1K) to enable wake-up from deep sleep
+
+
+Voltage measurements
+
+Real     Measured
+2.1 - Fails 
+2.2 - 2.51
+2.3 - 2.63
+2.4 - 2.74
+2.5 - 2.87
+2.6 - 2.98
+2.7 - 3.1
+2.8 - 3.21
+2.9 - 3.33
+3.0 - 3.44
+3.1 - 3.6
+3.2 - 3.7
+3.3 - 3.82
+3.4 - 3.95
+3.5 - 4.07
+3.6 - 4.18
+3.7 - 4.29
+3.8 - 4.41
+3.9 - 4.47

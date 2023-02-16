@@ -1,4 +1,4 @@
-package forecastprovider
+package weatherio
 
 import (
 	"testing"

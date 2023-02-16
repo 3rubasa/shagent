@@ -1,3 +1,75 @@
+03:45:30.640 -> Heater enabled: no
+03:45:30.640 -> Disable OTP reload: yes
+03:45:30.718 -> 22.380507
+03:45:30.718 -> Trying to resume WiFi connection...
+03:45:30.718 -> fpm close 3 
+03:45:30.718 -> Cannot resume WiFi connection, connecting via begin...
+03:45:30.718 -> mode : sta(8c:aa:b5:f4:c1:6d)
+03:45:30.718 -> add if0
+03:45:33.680 -> scandone
+03:45:34.534 -> state: 0 -> 2 (b0)
+03:45:34.534 -> state: 2 -> 3 (0)
+03:45:34.588 -> state: 3 -> 5 (10)
+03:45:34.588 -> add 0
+03:45:34.588 -> aid 2
+03:45:34.588 -> cnt 
+03:45:34.627 -> 
+03:45:34.627 -> connected with rr, channel 1
+03:45:34.627 -> dhcp client start...
+03:45:37.656 -> ip:10.42.0.130,mask:255.255.255.0,gw:10.42.0.1
+03:45:37.656 -> Duration: 6.933000
+03:45:34.627 -> connected with rr, channel 1
+03:45:34.627 -> dhcp client start...
+03:45:37.656 -> ip:10.42.0.130,mask:255.255.255.0,gw:10.42.0.1
+03:45:37.656 -> Duration: 6.933000
+03:45:37.656 -> 
+03:45:37.656 -> WiFi connected
+03:45:37.656 -> IP address: 
+03:45:37.656 -> 10.42.0.130
+03:45:37.656 -> Gateway IP adderss: 
+03:45:37.656 -> 10.42.0.1
+03:45:37.656 -> connecting to 10.42.0.128:3333
+03:45:37.727 -> sending data to server
+03:45:37.727 -> 
+03:45:37.727 -> closing connection
+03:45:37.809 -> state: 5 -> 0 (0)
+03:45:37.809 -> rm 0
+03:45:37.809 -> del if0
+03:45:37.809 -> usl
+03:45:37.809 -> mode : null
+03:45:37.859 -> force slp enable,type: 2
+03:45:37.859 -> fpm open,type:2 0
+03:45:37.859 -> Done.
+03:45:37.984 -> enter deep sleep
+
+
+-----------------------------------------------------------
+
+
+03:45:47.825 -> End of battery: no
+03:45:47.825 -> Heater enabled: no
+03:45:47.825 -> Disable OTP reload: yes
+03:45:47.858 -> 22.241079
+03:45:47.858 -> Trying to resume WiFi connection...
+03:45:48.029 -> fpm close 3 
+03:45:48.029 -> mode : sta(8c:aa:b5:f4:c1:6d)
+03:45:48.029 -> add if0
+03:45:48.234 -> scandone
+03:45:49.133 -> state: 0 -> 2 (b0)
+03:45:49.133 -> state: 2 -> 3 (0)
+03:45:49.133 -> state: 3 -> 5 (10)
+03:45:49.133 -> add 0
+03:45:49.133 -> aid 2
+03:45:49.133 -> cnt 
+03:45:49.164 -> 
+03:45:49.164 -> connected with rr, channel 1
+03:45:49.164 -> ip:10.42.0.130,mask:255.255.255.0,gw:10.42.0.1
+03:45:49.164 -> ip:10.42.0.130,mask:255.255.255.0,gw:10.42.0.1
+03:45:49.164 -> Duration: 1.295000
+03:45:49.164 -> 
+03:45:49.164 -> WiFi connected
+
+
 Temperature Decreasing with Time
 ----------------------------------------------------------------------
 | Start Temp | Outside Temp | End Temperature | Delta | Time Elapsed |

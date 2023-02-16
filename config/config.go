@@ -3,13 +3,14 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 )
 
 func ReadFromFile(path string) (*Config, error) {
 	cfgFile, err := os.Open(path)
 	if err != nil {
-		fmt.Println("Failed to open config file: ", err)
+		log.Println("ERROR: Failed to open config file: ", path, " Error: ", err)
 		return nil, err
 	}
 	defer cfgFile.Close()
@@ -17,7 +18,7 @@ func ReadFromFile(path string) (*Config, error) {
 	var cfg *Config
 	err = json.NewDecoder(cfgFile).Decode(&cfg)
 	if err != nil {
-		fmt.Println("Failed to read config file: ", err)
+		fmt.Println("ERROR: Failed to read config file: ", path, " Error: ", err)
 		return nil, err
 	}
 

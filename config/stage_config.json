@@ -12,6 +12,6 @@
         "enabled":false
     },
     "forecast_provider":{
-        "enabled":false
+        "enabled":true
     } 
 }
