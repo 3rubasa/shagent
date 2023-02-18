@@ -16,7 +16,7 @@ func Test_Success(t *testing.T) {
 	mockTDrv := mocktempsenordriver.NewMockTempSensorDriver(mockCtrl)
 	tController := New(mockTDrv, 10*time.Minute, 200*time.Millisecond)
 
-	mockTDrv.EXPECT().Initialize().Times(1)
+	mockTDrv.EXPECT().Start().Times(1)
 	mockTDrv.EXPECT().Get().Return(25.0, nil).MinTimes(1)
 
 	err := tController.Start()
@@ -36,7 +36,7 @@ func Test_CacheTTLExceeded(t *testing.T) {
 	tController := New(mockTDrv, time.Second, 200*time.Millisecond)
 
 	callCount := 0
-	mockTDrv.EXPECT().Initialize().Times(1)
+	mockTDrv.EXPECT().Start().Times(1)
 	mockTDrv.EXPECT().Get().DoAndReturn(func() (float64, error) {
 		callCount++
 
@@ -63,7 +63,7 @@ func Test_CacheTTLExceededThenSuccess(t *testing.T) {
 	tController := New(mockTDrv, time.Second, 200*time.Millisecond)
 
 	callCount := 0
-	mockTDrv.EXPECT().Initialize().Times(1)
+	mockTDrv.EXPECT().Start().Times(1)
 	mockTDrv.EXPECT().Get().DoAndReturn(func() (float64, error) {
 		callCount++
 

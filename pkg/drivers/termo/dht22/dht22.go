@@ -18,7 +18,7 @@ func New(Pin uint8) *Sensor {
 	}
 }
 
-func (s *Sensor) Initialize() error {
+func (s *Sensor) Start() error {
 	err := dht.HostInit()
 	if err != nil {
 		log.Println("ERROR: Failed to initialize DHT sersor: ", err)
@@ -31,6 +31,10 @@ func (s *Sensor) Initialize() error {
 		return err
 	}
 
+	return nil
+}
+
+func (s *Sensor) Stop() error {
 	return nil
 }
 

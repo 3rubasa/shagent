@@ -1,6 +1,7 @@
 .PHONY: default all
 
 production: build_raspi stop_svc_vpn deploy_agent_vpn deploy_config_vpn start_svc_vpn
+production_cli: build_cli_raspi deploy_cli_vpn
 stage: build_raspi deploy_local
 default: build deploy
 stage_cli: build_cli_raspi deploy_cli_local
@@ -36,7 +37,7 @@ test:
 	env SH_RUN_ALL_TESTS=0 GOOS=linux GOARCH=amd64 go test -count=1 ./...
 
 proto:
-	protoc --go_out=./ --go_opt=paths=source_relative --go-grpc_out=./ --go-grpc_opt=paths=source_relative ./grpcapi/grpcapi.proto
+	protoc --go_out=./ --go_opt=paths=source_relative --go-grpc_out=./ --go-grpc_opt=paths=source_relative ./pkg/grpcapi/grpcapi.proto
 
 cli_linux_amd64:
 	go env -w GOOS=linux && go env -w GOARCH=amd64 && go build -o bin/shagent_cli ./cmd/cli/...
@@ -46,3 +47,6 @@ build_cli_raspi:
 
 deploy_cli_local:
 	pscp -pw p ./bin/shagent_cli dima@10.42.0.1:/opt/shagent/shagent_cli
+
+deploy_cli_vpn:
+	pscp -pw p ./bin/shagent_cli dima@172.27.208.8:/opt/shagent/shagent_cli

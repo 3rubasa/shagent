@@ -32,7 +32,7 @@ func New(driver interfaces.TempSensorDriver, cacheTTL, pollingPeriod time.Durati
 }
 
 func (c *Controller) Start() error {
-	err := c.driver.Initialize()
+	err := c.driver.Start()
 	if err != nil {
 		fmt.Println("Error while starting temperature sensor controller: ", err)
 		return err
@@ -58,7 +58,7 @@ func (c *Controller) Stop() error {
 	c.ticker.Stop()
 	c.done <- true
 
-	return nil
+	return c.driver.Stop()
 }
 
 func (c *Controller) Get() (float64, error) {

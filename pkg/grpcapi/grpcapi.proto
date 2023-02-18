@@ -31,4 +31,5 @@ message StateT {
   int64 camLightState = 3;
   int64 boilerState = 4;
   int64 powerState = 5;
+  float pantryTemp = 6;
 }

@@ -26,6 +26,7 @@ func main() {
 	}
 
 	fmt.Println("Kitchen Temperature: .. ", s.KitchenTemp, " deg, C")
+	fmt.Println("Pantry Temperature: ... ", s.PantryTemp, " deg, C")
 	fmt.Println("Room Light: ........... ", s.RoomLightState)
 	fmt.Println("Cam Light: ............ ", s.CamLightState)
 	fmt.Println("Boiler State: ......... ", s.BoilerState)

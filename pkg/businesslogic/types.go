@@ -6,6 +6,7 @@ type BusinessLogicComponents struct {
 	KitchenTemp  TempSensorController
 	WindowTemp   TempSensorController
 	OutdoorsTemp TempSensorController
+	PantryTemp   TempSensorController
 	WeatherTemp  TempSensorController
 	ForecastTemp TempForecastController
 	Power        PowerSensorController
@@ -23,6 +24,8 @@ type State struct {
 	WindowTempValid     bool
 	OutdoorsTemp        float64
 	OutdoorsTempValid   bool
+	PantryTemp          float64
+	PantryTempValid     bool
 	WeatherTemp         float64
 	WeatherTempValid    bool
 	ForecastedTemp      float64

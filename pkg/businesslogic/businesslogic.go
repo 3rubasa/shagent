@@ -2,6 +2,7 @@ package businesslogic
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	urltools "net/url"
 	"sync"
@@ -54,6 +55,11 @@ func (b *BusinessLogic) Start() error {
 	err = b.c.OutdoorsTemp.Start()
 	if err != nil {
 		fmt.Println("Failed to start outdoors temperature sensor controller: ", err)
+	}
+
+	err = b.c.PantryTemp.Start()
+	if err != nil {
+		fmt.Println("Failed to start pantry temperature sensor controller: ", err)
 	}
 
 	err = b.c.WeatherTemp.Start()
@@ -156,6 +162,14 @@ func (b *BusinessLogic) pollSensors() {
 		s.WindowTempValid = true
 	}
 
+	t, err = b.c.PantryTemp.Get()
+	if err != nil {
+		log.Println("NOTICE: Could not get pantry temperature: ", err)
+	} else {
+		s.PantryTemp = t
+		s.PantryTempValid = true
+	}
+
 	t, err = b.c.WeatherTemp.Get()
 	if err != nil {
 		fmt.Println("Error while getting weather temperature: ", err)
@@ -219,8 +233,8 @@ func (b *BusinessLogic) sendState() {
 	if s.WindowTempValid {
 		url += "&field2=" + urltools.QueryEscape(fmt.Sprintf("%f", s.WindowTemp))
 	}
-	if s.OutdoorsTempValid {
-		url += "&field3=" + urltools.QueryEscape(fmt.Sprintf("%f", s.OutdoorsTemp))
+	if s.PantryTempValid {
+		url += "&field3=" + urltools.QueryEscape(fmt.Sprintf("%f", s.PantryTemp))
 	}
 	if s.PowerValid {
 		url += "&field4=" + urltools.QueryEscape(fmt.Sprintf("%d", s.Power))

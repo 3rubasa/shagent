@@ -10,7 +10,8 @@ type RelayDriver interface {
 }
 
 type TempSensorDriver interface {
-	Initialize() error
+	Start() error
+	Stop() error
 	Get() (float64, error)
 }
 

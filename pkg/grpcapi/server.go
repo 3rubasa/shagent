@@ -51,5 +51,11 @@ func (im *impl) GetState(ctx context.Context, e *empty.Empty) (*StateT, error) {
 		state.PowerState = -1
 	}
 
+	if s.PantryTempValid {
+		state.PantryTemp = float32(s.PantryTemp)
+	} else {
+		state.PantryTemp = -100.00
+	}
+
 	return state, nil
 }

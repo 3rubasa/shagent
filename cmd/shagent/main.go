@@ -27,6 +27,7 @@ import (
 	"github.com/3rubasa/shagent/pkg/drivers/relay/sonoffr3rf"
 	"github.com/3rubasa/shagent/pkg/drivers/relay/wsraspihatx3"
 	"github.com/3rubasa/shagent/pkg/drivers/termo/dht22"
+	"github.com/3rubasa/shagent/pkg/drivers/termo/esp8266"
 	"github.com/3rubasa/shagent/pkg/grpcapi"
 	"github.com/3rubasa/shagent/pkg/webserver"
 )
@@ -90,6 +91,9 @@ func main() {
 	outdoorsTempSensorDrv := dht22.New(23)
 	outdoorsTempController := temperature.New(outdoorsTempSensorDrv, 10*time.Minute, time.Minute)
 
+	pantryTempSensorDrv := esp8266.New(3333, 30*time.Minute)
+	pantryTempController := temperature.New(pantryTempSensorDrv, 30*time.Minute, 10*time.Minute)
+
 	// 6.4 - Weather Temperature
 	weatherTempProvider := weatherprovider.New(&cfg.WeatherProvider, "5e9e1159073f45d7a7063db8891c82b0", "stebnyk", "ua", time.Minute, 45*time.Minute, 95*time.Minute)
 
@@ -109,6 +113,7 @@ func main() {
 		WindowTemp:   windowTempController,
 		ForecastTemp: forecastTempProvider,
 		OutdoorsTemp: outdoorsTempController,
+		PantryTemp:   pantryTempController,
 		WeatherTemp:  weatherTempProvider,
 		Power:        powerController,
 		Boiler:       boilerController,
@@ -118,28 +123,38 @@ func main() {
 		{Min: -100, Max: -4}: {
 			{Min: -100, Max: 100}: {Min: 8, Max: 100}, // Don't turn off
 		},
-		{Min: -4, Max: -3}: {
+		{Min: -4, Max: 100}: {
 			{Min: -100, Max: -3}: {Min: 8, Max: 100}, // Don't turn off
 			{Min: -3, Max: 100}:  {Min: 6, Max: 8},
 		},
-		{Min: -3, Max: -1}: {
-			{Min: -100, Max: -3}: {Min: 8, Max: 100}, // Don't turn off
-			{Min: -3, Max: 1}:    {Min: 5, Max: 6},
-			{Min: 1, Max: 100}:   {Min: 5, Max: 6},
-		},
-		{Min: -1, Max: 1}: {
-			{Min: -100, Max: -3}: {Min: 8, Max: 100}, // Don't turn off
-			{Min: -3, Max: 0}:    {Min: 5, Max: 6},
-			{Min: 0, Max: 5}:     {Min: 5, Max: 6},
-			{Min: 5, Max: 100}:   {Min: 4, Max: 5},
-		},
-		{Min: 1, Max: 100}: {
-			{Min: -100, Max: -3}: {Min: 8, Max: 100}, // Don't turn off
-			{Min: -3, Max: 0}:    {Min: 5, Max: 6},
-			{Min: 0, Max: 1}:     {Min: 4, Max: 5},
-			{Min: 1, Max: 100}:   {Min: 3, Max: 4},
-		},
 	}
+
+	// tempControlTable := map[businesslogic.ForecestTempRange]map[businesslogic.WeatherTempRange]businesslogic.RoomTempRange{
+	// 	{Min: -100, Max: -4}: {
+	// 		{Min: -100, Max: 100}: {Min: 8, Max: 100}, // Don't turn off
+	// 	},
+	// 	{Min: -4, Max: -3}: {
+	// 		{Min: -100, Max: -3}: {Min: 8, Max: 100}, // Don't turn off
+	// 		{Min: -3, Max: 100}:  {Min: 6, Max: 8},
+	// 	},
+	// 	{Min: -3, Max: -1}: {
+	// 		{Min: -100, Max: -3}: {Min: 8, Max: 100}, // Don't turn off
+	// 		{Min: -3, Max: 1}:    {Min: 5, Max: 6},
+	// 		{Min: 1, Max: 100}:   {Min: 5, Max: 6},
+	// 	},
+	// 	{Min: -1, Max: 1}: {
+	// 		{Min: -100, Max: -3}: {Min: 8, Max: 100}, // Don't turn off
+	// 		{Min: -3, Max: 0}:    {Min: 5, Max: 6},
+	// 		{Min: 0, Max: 5}:     {Min: 5, Max: 6},
+	// 		{Min: 5, Max: 100}:   {Min: 4, Max: 5},
+	// 	},
+	// 	{Min: 1, Max: 100}: {
+	// 		{Min: -100, Max: -3}: {Min: 8, Max: 100}, // Don't turn off
+	// 		{Min: -3, Max: 0}:    {Min: 5, Max: 6},
+	// 		{Min: 0, Max: 1}:     {Min: 4, Max: 5},
+	// 		{Min: 1, Max: 100}:   {Min: 3, Max: 4},
+	// 	},
+	// }
 
 	businessRules := &businesslogic.BusinessRules{
 		TempControlTable: tempControlTable,

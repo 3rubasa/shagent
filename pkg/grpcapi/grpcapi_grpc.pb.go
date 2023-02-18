@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.6.1
-// source: grpcapi/grpcapi.proto
+// source: pkg/grpcapi/grpcapi.proto
 
 package grpcapi
 
@@ -102,5 +102,5 @@ var StateProvider_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "grpcapi/grpcapi.proto",
+	Metadata: "pkg/grpcapi/grpcapi.proto",
 }
