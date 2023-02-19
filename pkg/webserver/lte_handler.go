@@ -18,12 +18,12 @@ func NewLTEModuleHandler(c *APIComponents) *lteModuleHandler {
 
 func (h *lteModuleHandler) GetAccountBalance(rw http.ResponseWriter, r *http.Request) {
 	type Response struct {
-		Error   string `json:"error"`
-		Balance string `json:"balance"`
+		Error   string  `json:"error"`
+		Balance float64 `json:"balance"`
 	}
 	response := &Response{}
 
-	b, err := h.c.LTEModule.GetAccountBalance()
+	b, err := h.c.MC.GetCellAccBalance()
 
 	if err != nil {
 		fmt.Println("Failed to get cell account balance: ", err)
@@ -37,12 +37,12 @@ func (h *lteModuleHandler) GetAccountBalance(rw http.ResponseWriter, r *http.Req
 
 func (h *lteModuleHandler) GetInetBalance(rw http.ResponseWriter, r *http.Request) {
 	type Response struct {
-		Error   string `json:"error"`
-		Balance string `json:"balance"`
+		Error   string  `json:"error"`
+		Balance float64 `json:"balance"`
 	}
 	response := &Response{}
 
-	b, err := h.c.LTEModule.GetInetBalance()
+	b, err := h.c.MC.GetCellInetBalance()
 
 	if err != nil {
 		fmt.Println("Failed to get cell internet balance: ", err)
@@ -61,7 +61,7 @@ func (h *lteModuleHandler) GetTariff(rw http.ResponseWriter, r *http.Request) {
 	}
 	response := &Response{}
 
-	t, err := h.c.LTEModule.GetTariff()
+	t, err := h.c.MC.GetCellTariff()
 
 	if err != nil {
 		fmt.Println("Failed to get cell internet balance: ", err)

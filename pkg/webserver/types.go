@@ -1,12 +1,14 @@
 package webserver
 
+import "github.com/3rubasa/shagent/pkg/businesslogic"
+
 type APIComponents struct {
 	RoomLight   RelayController
 	CamLight    RelayController
 	KitchenTemp TempSensorController
 	Power       PowerSensorController
 	Boiler      RelayController
-	LTEModule   LTEModuleController
+	MC          businesslogic.MainController
 }
 
 type handlers struct {

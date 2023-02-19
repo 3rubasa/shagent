@@ -117,6 +117,7 @@ func main() {
 		WeatherTemp:  weatherTempProvider,
 		Power:        powerController,
 		Boiler:       boilerController,
+		LTEModule:    lteController,
 	}
 
 	tempControlTable := map[businesslogic.ForecestTempRange]map[businesslogic.WeatherTempRange]businesslogic.RoomTempRange{
@@ -173,7 +174,7 @@ func main() {
 		KitchenTemp: kitchenTempController,
 		Power:       powerController,
 		Boiler:      boilerController,
-		LTEModule:   lteController,
+		MC:          bl,
 	}
 
 	ws := webserver.New(components, 8888)

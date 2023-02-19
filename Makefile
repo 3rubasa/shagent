@@ -5,6 +5,8 @@ production_cli: build_cli_raspi deploy_cli_vpn
 stage: build_raspi deploy_local
 default: build deploy
 stage_cli: build_cli_raspi deploy_cli_local
+stage_all: stage stage_cli
+production_all: production production_cli
 
 build_linux_amd64:
 	go env -w GOOS=linux && go env -w GOARCH=amd64 && go build -o bin/shagent ./cmd/shagent/...
@@ -50,3 +52,9 @@ deploy_cli_local:
 
 deploy_cli_vpn:
 	pscp -pw p ./bin/shagent_cli dima@172.27.208.8:/opt/shagent/shagent_cli
+
+run_cli_local:
+	plink -pw p dima@10.42.0.1 "/opt/shagent/shagent_cli"
+
+win:
+	go env -w GOOS=windows && go env -w GOARCH=amd64

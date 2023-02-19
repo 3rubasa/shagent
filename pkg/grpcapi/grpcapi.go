@@ -10,16 +10,16 @@ import (
 )
 
 type API struct {
-	bl   *businesslogic.BusinessLogic
+	mc   businesslogic.MainController
 	impl *impl
 	port int
 	s    *grpc.Server
 }
 
-func New(bl *businesslogic.BusinessLogic, port int) *API {
+func New(mc businesslogic.MainController, port int) *API {
 	return &API{
-		bl:   bl,
-		impl: NewImpl(bl),
+		mc:   mc,
+		impl: NewImpl(mc),
 		port: port,
 	}
 }

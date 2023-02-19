@@ -21,15 +21,92 @@ import "google/protobuf/empty.proto";
 
 // The greeting service definition.
 service StateProvider {
-  rpc GetState(google.protobuf.Empty) returns (StateT) {}
+  rpc GetKitchenTemp(google.protobuf.Empty) returns (KitchenTempMessage) {}
+
+  rpc GetPowerState(google.protobuf.Empty) returns (PowerStateMessage) {}
+
+  rpc GetBoilerState(google.protobuf.Empty) returns (BoilerStateMessage) {}
+  rpc TurnOnBoiler(google.protobuf.Empty) returns (BoilerOpResultMessage) {}
+  rpc TurnOffBoiler(google.protobuf.Empty) returns (BoilerOpResultMessage) {}
+
+  rpc GetRoomLightState(google.protobuf.Empty) returns (RoomLightStateMessage) {}
+  rpc TurnOnRoomLight(google.protobuf.Empty) returns (RoomLightOpResultMessage) {}
+  rpc TurnOffRoomLight(google.protobuf.Empty) returns (RoomLightOpResultMessage) {}
+
+  rpc GetCamLightState(google.protobuf.Empty) returns (CamLightStateMessage) {}
+  rpc TurnOnCamLight(google.protobuf.Empty) returns (CamLightOpResultMessage) {}
+  rpc TurnOffCamLight(google.protobuf.Empty) returns (CamLightOpResultMessage) {}
+
+  rpc GetCellBalance(google.protobuf.Empty) returns (CellBalanceMessage) {}
+  rpc GetCellInetBalance(google.protobuf.Empty) returns (CellInetBalanceMessage) {}
+  rpc GetCellTariff(google.protobuf.Empty) returns (CellTariffMessage) {}
+  rpc GetCellPhoneNumber(google.protobuf.Empty) returns (CellPhoneNumberMessage) {}
 }
 
 // The request message containing the user's name.
-message StateT {
-  float kitchenTemp = 1;
-  int64 roomLightState = 2;
-  int64 camLightState = 3;
-  int64 boilerState = 4;
-  int64 powerState = 5;
-  float pantryTemp = 6;
+message KitchenTempMessage {
+  float T = 1;
+}
+
+message RoomLightStateMessage {
+  int64 S = 1;
+  bool Error = 2;
+  string ErrorMessage = 3;
+}
+
+message RoomLightOpResultMessage {
+  bool Error = 1;
+  string ErrorMessage = 2;
+}
+
+message CamLightStateMessage {
+  int64 S = 1;
+  bool Error = 2;
+  string ErrorMessage = 3;
+}
+
+message CamLightOpResultMessage {
+  bool Error = 1;
+  string ErrorMessage = 2;
+}
+
+message CellBalanceMessage {
+  float B = 1;
+  bool Error = 2;
+  string ErrorMessage = 3;
+}
+
+message CellInetBalanceMessage {
+  float B = 1;
+  bool Error = 2;
+  string ErrorMessage = 3;
+}
+
+message CellTariffMessage {
+  string T = 1;
+  bool Error = 2;
+  string ErrorMessage = 3;
+}
+
+message CellPhoneNumberMessage {
+  string P = 1;
+  bool Error = 2;
+  string ErrorMessage = 3;
+}
+
+message PowerStateMessage {
+  int64 S = 1;
+  bool Error = 2;
+  string ErrorMessage = 3;
+}
+
+message BoilerStateMessage {
+  int64 S = 1;
+  bool Error = 2;
+  string ErrorMessage = 3;
+}
+
+message BoilerOpResultMessage {
+  bool Error = 1;
+  string ErrorMessage = 2;
 }

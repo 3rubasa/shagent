@@ -23,7 +23,21 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StateProviderClient interface {
-	GetState(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*StateT, error)
+	GetKitchenTemp(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*KitchenTempMessage, error)
+	GetPowerState(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*PowerStateMessage, error)
+	GetBoilerState(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*BoilerStateMessage, error)
+	TurnOnBoiler(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*BoilerOpResultMessage, error)
+	TurnOffBoiler(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*BoilerOpResultMessage, error)
+	GetRoomLightState(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*RoomLightStateMessage, error)
+	TurnOnRoomLight(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*RoomLightOpResultMessage, error)
+	TurnOffRoomLight(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*RoomLightOpResultMessage, error)
+	GetCamLightState(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CamLightStateMessage, error)
+	TurnOnCamLight(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CamLightOpResultMessage, error)
+	TurnOffCamLight(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CamLightOpResultMessage, error)
+	GetCellBalance(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CellBalanceMessage, error)
+	GetCellInetBalance(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CellInetBalanceMessage, error)
+	GetCellTariff(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CellTariffMessage, error)
+	GetCellPhoneNumber(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CellPhoneNumberMessage, error)
 }
 
 type stateProviderClient struct {
@@ -34,9 +48,135 @@ func NewStateProviderClient(cc grpc.ClientConnInterface) StateProviderClient {
 	return &stateProviderClient{cc}
 }
 
-func (c *stateProviderClient) GetState(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*StateT, error) {
-	out := new(StateT)
-	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/GetState", in, out, opts...)
+func (c *stateProviderClient) GetKitchenTemp(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*KitchenTempMessage, error) {
+	out := new(KitchenTempMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/GetKitchenTemp", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) GetPowerState(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*PowerStateMessage, error) {
+	out := new(PowerStateMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/GetPowerState", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) GetBoilerState(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*BoilerStateMessage, error) {
+	out := new(BoilerStateMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/GetBoilerState", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) TurnOnBoiler(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*BoilerOpResultMessage, error) {
+	out := new(BoilerOpResultMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/TurnOnBoiler", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) TurnOffBoiler(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*BoilerOpResultMessage, error) {
+	out := new(BoilerOpResultMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/TurnOffBoiler", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) GetRoomLightState(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*RoomLightStateMessage, error) {
+	out := new(RoomLightStateMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/GetRoomLightState", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) TurnOnRoomLight(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*RoomLightOpResultMessage, error) {
+	out := new(RoomLightOpResultMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/TurnOnRoomLight", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) TurnOffRoomLight(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*RoomLightOpResultMessage, error) {
+	out := new(RoomLightOpResultMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/TurnOffRoomLight", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) GetCamLightState(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CamLightStateMessage, error) {
+	out := new(CamLightStateMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/GetCamLightState", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) TurnOnCamLight(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CamLightOpResultMessage, error) {
+	out := new(CamLightOpResultMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/TurnOnCamLight", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) TurnOffCamLight(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CamLightOpResultMessage, error) {
+	out := new(CamLightOpResultMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/TurnOffCamLight", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) GetCellBalance(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CellBalanceMessage, error) {
+	out := new(CellBalanceMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/GetCellBalance", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) GetCellInetBalance(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CellInetBalanceMessage, error) {
+	out := new(CellInetBalanceMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/GetCellInetBalance", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) GetCellTariff(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CellTariffMessage, error) {
+	out := new(CellTariffMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/GetCellTariff", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stateProviderClient) GetCellPhoneNumber(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CellPhoneNumberMessage, error) {
+	out := new(CellPhoneNumberMessage)
+	err := c.cc.Invoke(ctx, "/grpcapi.StateProvider/GetCellPhoneNumber", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +187,21 @@ func (c *stateProviderClient) GetState(ctx context.Context, in *empty.Empty, opt
 // All implementations must embed UnimplementedStateProviderServer
 // for forward compatibility
 type StateProviderServer interface {
-	GetState(context.Context, *empty.Empty) (*StateT, error)
+	GetKitchenTemp(context.Context, *empty.Empty) (*KitchenTempMessage, error)
+	GetPowerState(context.Context, *empty.Empty) (*PowerStateMessage, error)
+	GetBoilerState(context.Context, *empty.Empty) (*BoilerStateMessage, error)
+	TurnOnBoiler(context.Context, *empty.Empty) (*BoilerOpResultMessage, error)
+	TurnOffBoiler(context.Context, *empty.Empty) (*BoilerOpResultMessage, error)
+	GetRoomLightState(context.Context, *empty.Empty) (*RoomLightStateMessage, error)
+	TurnOnRoomLight(context.Context, *empty.Empty) (*RoomLightOpResultMessage, error)
+	TurnOffRoomLight(context.Context, *empty.Empty) (*RoomLightOpResultMessage, error)
+	GetCamLightState(context.Context, *empty.Empty) (*CamLightStateMessage, error)
+	TurnOnCamLight(context.Context, *empty.Empty) (*CamLightOpResultMessage, error)
+	TurnOffCamLight(context.Context, *empty.Empty) (*CamLightOpResultMessage, error)
+	GetCellBalance(context.Context, *empty.Empty) (*CellBalanceMessage, error)
+	GetCellInetBalance(context.Context, *empty.Empty) (*CellInetBalanceMessage, error)
+	GetCellTariff(context.Context, *empty.Empty) (*CellTariffMessage, error)
+	GetCellPhoneNumber(context.Context, *empty.Empty) (*CellPhoneNumberMessage, error)
 	mustEmbedUnimplementedStateProviderServer()
 }
 
@@ -55,8 +209,50 @@ type StateProviderServer interface {
 type UnimplementedStateProviderServer struct {
 }
 
-func (UnimplementedStateProviderServer) GetState(context.Context, *empty.Empty) (*StateT, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetState not implemented")
+func (UnimplementedStateProviderServer) GetKitchenTemp(context.Context, *empty.Empty) (*KitchenTempMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetKitchenTemp not implemented")
+}
+func (UnimplementedStateProviderServer) GetPowerState(context.Context, *empty.Empty) (*PowerStateMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPowerState not implemented")
+}
+func (UnimplementedStateProviderServer) GetBoilerState(context.Context, *empty.Empty) (*BoilerStateMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBoilerState not implemented")
+}
+func (UnimplementedStateProviderServer) TurnOnBoiler(context.Context, *empty.Empty) (*BoilerOpResultMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TurnOnBoiler not implemented")
+}
+func (UnimplementedStateProviderServer) TurnOffBoiler(context.Context, *empty.Empty) (*BoilerOpResultMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TurnOffBoiler not implemented")
+}
+func (UnimplementedStateProviderServer) GetRoomLightState(context.Context, *empty.Empty) (*RoomLightStateMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRoomLightState not implemented")
+}
+func (UnimplementedStateProviderServer) TurnOnRoomLight(context.Context, *empty.Empty) (*RoomLightOpResultMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TurnOnRoomLight not implemented")
+}
+func (UnimplementedStateProviderServer) TurnOffRoomLight(context.Context, *empty.Empty) (*RoomLightOpResultMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TurnOffRoomLight not implemented")
+}
+func (UnimplementedStateProviderServer) GetCamLightState(context.Context, *empty.Empty) (*CamLightStateMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCamLightState not implemented")
+}
+func (UnimplementedStateProviderServer) TurnOnCamLight(context.Context, *empty.Empty) (*CamLightOpResultMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TurnOnCamLight not implemented")
+}
+func (UnimplementedStateProviderServer) TurnOffCamLight(context.Context, *empty.Empty) (*CamLightOpResultMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TurnOffCamLight not implemented")
+}
+func (UnimplementedStateProviderServer) GetCellBalance(context.Context, *empty.Empty) (*CellBalanceMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCellBalance not implemented")
+}
+func (UnimplementedStateProviderServer) GetCellInetBalance(context.Context, *empty.Empty) (*CellInetBalanceMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCellInetBalance not implemented")
+}
+func (UnimplementedStateProviderServer) GetCellTariff(context.Context, *empty.Empty) (*CellTariffMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCellTariff not implemented")
+}
+func (UnimplementedStateProviderServer) GetCellPhoneNumber(context.Context, *empty.Empty) (*CellPhoneNumberMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCellPhoneNumber not implemented")
 }
 func (UnimplementedStateProviderServer) mustEmbedUnimplementedStateProviderServer() {}
 
@@ -71,20 +267,272 @@ func RegisterStateProviderServer(s grpc.ServiceRegistrar, srv StateProviderServe
 	s.RegisterService(&StateProvider_ServiceDesc, srv)
 }
 
-func _StateProvider_GetState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StateProvider_GetKitchenTemp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(empty.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StateProviderServer).GetState(ctx, in)
+		return srv.(StateProviderServer).GetKitchenTemp(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpcapi.StateProvider/GetState",
+		FullMethod: "/grpcapi.StateProvider/GetKitchenTemp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StateProviderServer).GetState(ctx, req.(*empty.Empty))
+		return srv.(StateProviderServer).GetKitchenTemp(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_GetPowerState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).GetPowerState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/GetPowerState",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).GetPowerState(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_GetBoilerState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).GetBoilerState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/GetBoilerState",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).GetBoilerState(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_TurnOnBoiler_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).TurnOnBoiler(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/TurnOnBoiler",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).TurnOnBoiler(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_TurnOffBoiler_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).TurnOffBoiler(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/TurnOffBoiler",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).TurnOffBoiler(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_GetRoomLightState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).GetRoomLightState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/GetRoomLightState",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).GetRoomLightState(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_TurnOnRoomLight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).TurnOnRoomLight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/TurnOnRoomLight",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).TurnOnRoomLight(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_TurnOffRoomLight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).TurnOffRoomLight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/TurnOffRoomLight",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).TurnOffRoomLight(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_GetCamLightState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).GetCamLightState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/GetCamLightState",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).GetCamLightState(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_TurnOnCamLight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).TurnOnCamLight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/TurnOnCamLight",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).TurnOnCamLight(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_TurnOffCamLight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).TurnOffCamLight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/TurnOffCamLight",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).TurnOffCamLight(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_GetCellBalance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).GetCellBalance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/GetCellBalance",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).GetCellBalance(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_GetCellInetBalance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).GetCellInetBalance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/GetCellInetBalance",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).GetCellInetBalance(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_GetCellTariff_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).GetCellTariff(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/GetCellTariff",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).GetCellTariff(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StateProvider_GetCellPhoneNumber_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StateProviderServer).GetCellPhoneNumber(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpcapi.StateProvider/GetCellPhoneNumber",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StateProviderServer).GetCellPhoneNumber(ctx, req.(*empty.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -97,8 +545,64 @@ var StateProvider_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*StateProviderServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetState",
-			Handler:    _StateProvider_GetState_Handler,
+			MethodName: "GetKitchenTemp",
+			Handler:    _StateProvider_GetKitchenTemp_Handler,
+		},
+		{
+			MethodName: "GetPowerState",
+			Handler:    _StateProvider_GetPowerState_Handler,
+		},
+		{
+			MethodName: "GetBoilerState",
+			Handler:    _StateProvider_GetBoilerState_Handler,
+		},
+		{
+			MethodName: "TurnOnBoiler",
+			Handler:    _StateProvider_TurnOnBoiler_Handler,
+		},
+		{
+			MethodName: "TurnOffBoiler",
+			Handler:    _StateProvider_TurnOffBoiler_Handler,
+		},
+		{
+			MethodName: "GetRoomLightState",
+			Handler:    _StateProvider_GetRoomLightState_Handler,
+		},
+		{
+			MethodName: "TurnOnRoomLight",
+			Handler:    _StateProvider_TurnOnRoomLight_Handler,
+		},
+		{
+			MethodName: "TurnOffRoomLight",
+			Handler:    _StateProvider_TurnOffRoomLight_Handler,
+		},
+		{
+			MethodName: "GetCamLightState",
+			Handler:    _StateProvider_GetCamLightState_Handler,
+		},
+		{
+			MethodName: "TurnOnCamLight",
+			Handler:    _StateProvider_TurnOnCamLight_Handler,
+		},
+		{
+			MethodName: "TurnOffCamLight",
+			Handler:    _StateProvider_TurnOffCamLight_Handler,
+		},
+		{
+			MethodName: "GetCellBalance",
+			Handler:    _StateProvider_GetCellBalance_Handler,
+		},
+		{
+			MethodName: "GetCellInetBalance",
+			Handler:    _StateProvider_GetCellInetBalance_Handler,
+		},
+		{
+			MethodName: "GetCellTariff",
+			Handler:    _StateProvider_GetCellTariff_Handler,
+		},
+		{
+			MethodName: "GetCellPhoneNumber",
+			Handler:    _StateProvider_GetCellPhoneNumber_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

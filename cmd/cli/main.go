@@ -1,13 +1,12 @@
 package main
 
 import (
-	"context"
 	"fmt"
+	"os"
 
 	"github.com/3rubasa/shagent/pkg/grpcapi"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 func main() {
@@ -19,16 +18,34 @@ func main() {
 
 	c := grpcapi.NewStateProviderClient(conn)
 
-	s, err := c.GetState(context.Background(), &emptypb.Empty{})
-	if err != nil {
-		fmt.Println("ERROR: Could not get state: ", err)
-		return
+	if len(os.Args) == 1 {
+		PrintState(c)
+	} else {
+		switch os.Args[1] {
+		case "roomlight_on":
+			TurnOnRoomLight(c)
+		case "roomlight_off":
+			TurnOffRoomLight(c)
+		case "camlight_on":
+			TurnOnCamLight(c)
+		case "camlight_off":
+			TurnOffCamLight(c)
+		case "cell":
+			PrintCellInfo(c)
+		case "cell_balance":
+			PrintCellBalance(c)
+		case "cell_inet":
+			PrintCellInetBalance(c)
+		case "cell_tariff":
+			PrintCellTariff(c)
+		case "cell_phone":
+			PrintCellPhoneNumber(c)
+		case "boiler_on":
+			TurnOnBoiler(c)
+		case "boiler_off":
+			TurnOffBoiler(c)
+		default:
+			fmt.Println("Invalid argument")
+		}
 	}
-
-	fmt.Println("Kitchen Temperature: .. ", s.KitchenTemp, " deg, C")
-	fmt.Println("Pantry Temperature: ... ", s.PantryTemp, " deg, C")
-	fmt.Println("Room Light: ........... ", s.RoomLightState)
-	fmt.Println("Cam Light: ............ ", s.CamLightState)
-	fmt.Println("Boiler State: ......... ", s.BoilerState)
-	fmt.Println("Power State: .......... ", s.PowerState)
 }

@@ -9,53 +9,206 @@ import (
 
 type impl struct {
 	UnimplementedStateProviderServer
-	bl *businesslogic.BusinessLogic
+	mc businesslogic.MainController
 }
 
-func NewImpl(bl *businesslogic.BusinessLogic) *impl {
+func NewImpl(mc businesslogic.MainController) *impl {
 	return &impl{
-		bl: bl,
+		mc: mc,
 	}
 }
-func (im *impl) GetState(ctx context.Context, e *empty.Empty) (*StateT, error) {
-	s := im.bl.GetState()
-	state := &StateT{}
 
-	if s.BoilerStateValid {
-		state.BoilerState = int64(s.BoilerState)
-	} else {
-		state.BoilerState = -1
+func (im *impl) GetKitchenTemp(ctx context.Context, e *empty.Empty) (*KitchenTempMessage, error) {
+	t, err := im.mc.GetKitchenTemp()
+	if err != nil {
+		// Invalid temperature value indicate the fact that temperature is not available
+		t = 998.0
 	}
 
-	if s.RoomLightStateValid {
-		state.RoomLightState = int64(s.RoomLightState)
+	return &KitchenTempMessage{T: float32(t)}, nil
+}
+
+func (im *impl) GetPowerState(ctx context.Context, e *empty.Empty) (*PowerStateMessage, error) {
+	res := &PowerStateMessage{}
+
+	s, err := im.mc.GetPowerState()
+	if err != nil {
+		res.Error = true
+		res.ErrorMessage = err.Error()
 	} else {
-		state.RoomLightState = -1
+		res.S = int64(s)
 	}
 
-	if s.CamLightStateValid {
-		state.CamLightState = int64(s.CamLightState)
+	return res, nil
+}
+
+func (im *impl) GetBoilerState(ctx context.Context, e *empty.Empty) (*BoilerStateMessage, error) {
+	res := &BoilerStateMessage{}
+
+	s, err := im.mc.GetBoilerState()
+	if err != nil {
+		res.Error = true
+		res.ErrorMessage = err.Error()
 	} else {
-		state.CamLightState = -1
+		res.S = int64(s)
 	}
 
-	if s.KitchenTempValid {
-		state.KitchenTemp = float32(s.KitchenTemp)
-	} else {
-		state.KitchenTemp = -275.0
+	return res, nil
+}
+
+func (im *impl) TurnOnBoiler(ctx context.Context, e *empty.Empty) (*BoilerOpResultMessage, error) {
+	res := &BoilerOpResultMessage{}
+
+	err := im.mc.TurnOnBoiler()
+	if err != nil {
+		res.Error = true
+		res.ErrorMessage = err.Error()
 	}
 
-	if s.PowerValid {
-		state.PowerState = int64(s.Power)
-	} else {
-		state.PowerState = -1
+	return res, nil
+}
+
+func (im *impl) TurnOffBoiler(ctx context.Context, e *empty.Empty) (*BoilerOpResultMessage, error) {
+	res := &BoilerOpResultMessage{}
+
+	err := im.mc.TurnOffBoiler()
+	if err != nil {
+		res.Error = true
+		res.ErrorMessage = err.Error()
 	}
 
-	if s.PantryTempValid {
-		state.PantryTemp = float32(s.PantryTemp)
+	return res, nil
+}
+
+func (im *impl) GetRoomLightState(ctx context.Context, e *empty.Empty) (*RoomLightStateMessage, error) {
+	res := &RoomLightStateMessage{}
+
+	s, err := im.mc.GetRoomLightState()
+	if err != nil {
+		// Invalid temperature value indicate the fact that temperature is not available
+		res.Error = true
+		res.ErrorMessage = err.Error()
 	} else {
-		state.PantryTemp = -100.00
+		res.S = int64(s)
 	}
 
-	return state, nil
+	return res, nil
+}
+
+func (im *impl) TurnOnRoomLight(ctx context.Context, e *empty.Empty) (*RoomLightOpResultMessage, error) {
+	res := &RoomLightOpResultMessage{}
+
+	err := im.mc.TurnOnRoomLight()
+	if err != nil {
+		res.Error = true
+		res.ErrorMessage = err.Error()
+	}
+
+	return res, nil
+}
+
+func (im *impl) TurnOffRoomLight(ctx context.Context, e *empty.Empty) (*RoomLightOpResultMessage, error) {
+	res := &RoomLightOpResultMessage{}
+
+	err := im.mc.TurnOffRoomLight()
+	if err != nil {
+		res.Error = true
+		res.ErrorMessage = err.Error()
+	}
+
+	return res, nil
+}
+
+func (im *impl) GetCamLightState(ctx context.Context, e *empty.Empty) (*CamLightStateMessage, error) {
+	res := &CamLightStateMessage{}
+
+	s, err := im.mc.GetCamLightState()
+	if err != nil {
+		// Invalid temperature value indicate the fact that temperature is not available
+		res.Error = true
+		res.ErrorMessage = err.Error()
+	} else {
+		res.S = int64(s)
+	}
+
+	return res, nil
+}
+
+func (im *impl) TurnOnCamLight(ctx context.Context, e *empty.Empty) (*CamLightOpResultMessage, error) {
+	res := &CamLightOpResultMessage{}
+
+	err := im.mc.TurnOnCamLight()
+	if err != nil {
+		res.Error = true
+		res.ErrorMessage = err.Error()
+	}
+
+	return res, nil
+}
+
+func (im *impl) TurnOffCamLight(ctx context.Context, e *empty.Empty) (*CamLightOpResultMessage, error) {
+	res := &CamLightOpResultMessage{}
+
+	err := im.mc.TurnOffCamLight()
+	if err != nil {
+		res.Error = true
+		res.ErrorMessage = err.Error()
+	}
+
+	return res, nil
+}
+
+func (im *impl) GetCellBalance(ctx context.Context, e *empty.Empty) (*CellBalanceMessage, error) {
+	res := &CellBalanceMessage{}
+
+	b, err := im.mc.GetCellAccBalance()
+	if err != nil {
+		res.Error = true
+		res.ErrorMessage = err.Error()
+	} else {
+		res.B = float32(b)
+	}
+
+	return res, nil
+}
+
+func (im *impl) GetCellInetBalance(ctx context.Context, e *empty.Empty) (*CellInetBalanceMessage, error) {
+	res := &CellInetBalanceMessage{}
+
+	b, err := im.mc.GetCellInetBalance()
+	if err != nil {
+		res.Error = true
+		res.ErrorMessage = err.Error()
+	} else {
+		res.B = float32(b)
+	}
+
+	return res, nil
+}
+
+func (im *impl) GetCellTariff(ctx context.Context, e *empty.Empty) (*CellTariffMessage, error) {
+	res := &CellTariffMessage{}
+
+	t, err := im.mc.GetCellTariff()
+	if err != nil {
+		res.Error = true
+		res.ErrorMessage = err.Error()
+	} else {
+		res.T = t
+	}
+
+	return res, nil
+}
+func (im *impl) GetCellPhoneNumber(ctx context.Context, e *empty.Empty) (*CellPhoneNumberMessage, error) {
+	res := &CellPhoneNumberMessage{}
+
+	p, err := im.mc.GetCellPhoneNumber()
+	if err != nil {
+		res.Error = true
+		res.ErrorMessage = err.Error()
+	} else {
+		res.P = p
+	}
+
+	return res, nil
 }

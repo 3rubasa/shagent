@@ -11,6 +11,7 @@ type BusinessLogicComponents struct {
 	ForecastTemp TempForecastController
 	Power        PowerSensorController
 	Boiler       BoilerController
+	LTEModule    LTEModuleController
 }
 
 type State struct {
