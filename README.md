@@ -17,6 +17,7 @@ Smart Home Agent, running on Raspberry Pi
 - SIM7600 LTE module controller
 - 3-channel GPIO switch (relay)
 - Sonoff R3RF WiFi switch (relay)
+- GPIO-based power sensor (on/off)
 
 ### CLI app commands:
 ```
