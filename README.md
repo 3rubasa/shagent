@@ -31,5 +31,3 @@ $shagent_cli cell_phone # print sim phone number
 $shagent_cli boiler_on # force turn the boiler on
 $shagent_cli boiler_off # force turn the boiler off
 ```
-
-### REST API
