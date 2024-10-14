@@ -15,16 +15,16 @@ build_raspi:
 	go env -w GOOS=linux && go env -w GOARCH=arm64 && go build -o bin/shagent ./cmd/shagent/...
 
 stop_svc_vpn:
-	plink -pw p dima@172.27.208.8 "sudo systemctl stop shagent.service"
+	plink -pw p dima@172.27.240.3 "sudo systemctl stop shagent.service"
 
 deploy_agent_vpn:
-	pscp -pw p ./bin/shagent dima@172.27.208.8:/opt/shagent/shagent
+	pscp -pw p ./bin/shagent dima@172.27.240.3:/opt/shagent/shagent
 
 deploy_config_vpn:
-	pscp -pw p ./config/prod_config.json dima@172.27.208.8:/opt/shagent/shagent.json
+	pscp -pw p ./config/prod_config.json dima@172.27.240.3:/opt/shagent/shagent.json
 
 start_svc_vpn:
-	plink -pw p dima@172.27.208.8 "sudo systemctl start shagent.service"
+	plink -pw p dima@172.27.240.3 "sudo systemctl start shagent.service"
 
 deploy_local:
 	plink -pw p dima@10.42.0.1 "sudo systemctl stop shagent.service" && pscp -pw p ./bin/shagent dima@10.42.0.1:/opt/shagent/shagent && pscp -pw p ./config/stage_config.json dima@10.42.0.1:/opt/shagent/shagent.json && plink -pw p dima@10.42.0.1 "sudo systemctl start shagent.service"
@@ -51,7 +51,7 @@ deploy_cli_local:
 	pscp -pw p ./bin/shagent_cli dima@10.42.0.1:/opt/shagent/shagent_cli
 
 deploy_cli_vpn:
-	pscp -pw p ./bin/shagent_cli dima@172.27.208.8:/opt/shagent/shagent_cli
+	pscp -pw p ./bin/shagent_cli dima@172.27.240.3:/opt/shagent/shagent_cli
 
 run_cli_local:
 	plink -pw p dima@10.42.0.1 "/opt/shagent/shagent_cli"

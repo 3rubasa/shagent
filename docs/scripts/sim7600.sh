@@ -88,7 +88,7 @@ while true
 do
     echo "DHCP, try #$TRIES"
     
-    udhcpc -i wwan0
+    /sbin/udhcpc -i wwan0cd 
     
     if [ $? -ne 0 ]; then
         echo "Failed. Retrying after delay..."

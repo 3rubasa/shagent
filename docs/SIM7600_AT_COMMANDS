@@ -9,6 +9,7 @@
 
 3. Install minicom Tool
   a. > sudo apt install minicom
+  b. > sudo apt install libqmi-utils udhcpc
 
 4. Open serial port connection to SIM7600 with minicom
    a. > sudo minicom -D /dev/ttyUSB2   # I don't know why USB2, but it works
