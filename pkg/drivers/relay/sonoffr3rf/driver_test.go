@@ -20,7 +20,7 @@ func Test_GetState_On(t *testing.T) {
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	osSvcs.EXPECT().GetIPFromMAC("dummy_mac_address").Return("127.0.0.1", nil).Times(1)
 
-	testAPI := New(osSvcs, "dummy_mac_address")
+	testAPI := New(osSvcs, "dummy_mac_address", "dummy_device_id")
 
 	l, err := net.Listen("tcp", "127.0.0.1:8081")
 	assert.NoError(t, err)
@@ -29,7 +29,7 @@ func Test_GetState_On(t *testing.T) {
 	expectedURLPath := "/zeroconf/info"
 	actualURLPath := ""
 	expectedBody := `{ 
-		"deviceid": "", 
+		"deviceid": "dummy_device_id", 
 		"data": { } 
 	 }`
 	actualBody := ""
@@ -80,7 +80,7 @@ func Test_GetState_Off(t *testing.T) {
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	osSvcs.EXPECT().GetIPFromMAC("dummy_mac_address").Return("127.0.0.1", nil).Times(1)
 
-	testAPI := New(osSvcs, "dummy_mac_address")
+	testAPI := New(osSvcs, "dummy_mac_address", "dummy_device_id")
 
 	l, err := net.Listen("tcp", "127.0.0.1:8081")
 	assert.NoError(t, err)
@@ -126,7 +126,7 @@ func Test_GetState_ErrorInResponse(t *testing.T) {
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	osSvcs.EXPECT().GetIPFromMAC("dummy_mac_address").Return("127.0.0.1", nil).Times(1)
 
-	testAPI := New(osSvcs, "dummy_mac_address")
+	testAPI := New(osSvcs, "dummy_mac_address", "dummy_device_id")
 
 	l, err := net.Listen("tcp", "127.0.0.1:8081")
 	assert.NoError(t, err)
@@ -172,7 +172,7 @@ func Test_GetState_ErrorNoServer(t *testing.T) {
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	osSvcs.EXPECT().GetIPFromMAC("dummy_mac_address").Return("127.0.0.1", nil).Times(1)
 
-	testAPI := New(osSvcs, "dummy_mac_address")
+	testAPI := New(osSvcs, "dummy_mac_address", "dummy_device_id")
 
 	expectedState := ""
 	actualState, err := testAPI.GetState()
@@ -188,7 +188,7 @@ func Test_GetState_ErrorGettingIPAddr(t *testing.T) {
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	osSvcs.EXPECT().GetIPFromMAC("dummy_mac_address").Return("", errors.New("dummy error")).Times(1)
 
-	testAPI := New(osSvcs, "dummy_mac_address")
+	testAPI := New(osSvcs, "dummy_mac_address", "dummy_device_id")
 
 	expectedState := ""
 	actualState, err := testAPI.GetState()
@@ -204,7 +204,7 @@ func Test_TurnOn(t *testing.T) {
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	osSvcs.EXPECT().GetIPFromMAC("dummy_mac_address").Return("127.0.0.1", nil).Times(1)
 
-	testAPI := New(osSvcs, "dummy_mac_address")
+	testAPI := New(osSvcs, "dummy_mac_address", "dummy_device_id")
 
 	l, err := net.Listen("tcp", "127.0.0.1:8081")
 	assert.NoError(t, err)
@@ -212,7 +212,7 @@ func Test_TurnOn(t *testing.T) {
 	expectedURLPath := "/zeroconf/switch"
 	actualURLPath := ""
 	expectedBody := `{ 
-		"deviceid": "", 
+		"deviceid": "dummy_device_id", 
 		"data": {
 			"switch": "on" 
 		} 
@@ -251,7 +251,7 @@ func Test_TurnOn_Error(t *testing.T) {
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	osSvcs.EXPECT().GetIPFromMAC("dummy_mac_address").Return("127.0.0.1", nil).Times(1)
 
-	testAPI := New(osSvcs, "dummy_mac_address")
+	testAPI := New(osSvcs, "dummy_mac_address", "dummy_device_id")
 
 	l, err := net.Listen("tcp", "127.0.0.1:8081")
 	assert.NoError(t, err)
@@ -281,7 +281,7 @@ func Test_TurnOn_ErrorNoServer(t *testing.T) {
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	osSvcs.EXPECT().GetIPFromMAC("dummy_mac_address").Return("127.0.0.1", nil).Times(1)
 
-	testAPI := New(osSvcs, "dummy_mac_address")
+	testAPI := New(osSvcs, "dummy_mac_address", "dummy_device_id")
 
 	err := testAPI.TurnOn()
 
@@ -295,7 +295,7 @@ func Test_TurnOff(t *testing.T) {
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	osSvcs.EXPECT().GetIPFromMAC("dummy_mac_address").Return("127.0.0.1", nil).Times(1)
 
-	testAPI := New(osSvcs, "dummy_mac_address")
+	testAPI := New(osSvcs, "dummy_mac_address", "dummy_device_id")
 
 	l, err := net.Listen("tcp", "127.0.0.1:8081")
 	assert.NoError(t, err)
@@ -303,7 +303,7 @@ func Test_TurnOff(t *testing.T) {
 	expectedURLPath := "/zeroconf/switch"
 	actualURLPath := ""
 	expectedBody := `{ 
-		"deviceid": "", 
+		"deviceid": "dummy_device_id", 
 		"data": {
 			"switch": "off" 
 		} 
@@ -342,7 +342,7 @@ func Test_TurnOff_Error(t *testing.T) {
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	osSvcs.EXPECT().GetIPFromMAC("dummy_mac_address").Return("127.0.0.1", nil).Times(1)
 
-	testAPI := New(osSvcs, "dummy_mac_address")
+	testAPI := New(osSvcs, "dummy_mac_address", "dummy_device_id")
 
 	l, err := net.Listen("tcp", "127.0.0.1:8081")
 	assert.NoError(t, err)
@@ -372,7 +372,7 @@ func Test_TurnOff_ErrorNoServer(t *testing.T) {
 	osSvcs := mockosservicesprovider.NewMockOSServicesProvider(mockCtrl)
 	osSvcs.EXPECT().GetIPFromMAC("dummy_mac_address").Return("127.0.0.1", nil).Times(1)
 
-	testAPI := New(osSvcs, "dummy_mac_address")
+	testAPI := New(osSvcs, "dummy_mac_address", "dummy_device_id")
 
 	err := testAPI.TurnOff()
 

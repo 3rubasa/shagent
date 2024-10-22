@@ -11,20 +11,20 @@ const (
 )
 
 const (
-	relayInfoBody = `{ 
-		"deviceid": "", 
+	relayInfoBodyTmpl = `{ 
+		"deviceid": "%s", 
 		"data": { } 
 	 }`
 
-	relaySwitchOnBody = `{ 
-		"deviceid": "", 
+	relaySwitchOnBodyTmpl = `{ 
+		"deviceid": "%s", 
 		"data": {
 			"switch": "on" 
 		} 
 	 }`
 
-	relaySwitchOffBody = `{ 
-		"deviceid": "", 
+	relaySwitchOffBodyTmpl = `{ 
+		"deviceid": "%s", 
 		"data": {
 			"switch": "off" 
 		} 

@@ -1,2 +1,5 @@
 API Reference: 
 https://sonoff.tech/sonoff-diy-developer-documentation-basicr3-rfr3-mini-http-api/
+
+deviceId: GET http://10.10.7.1/device
+Update firmware to the latest using eWeLink (use compatible pairing)

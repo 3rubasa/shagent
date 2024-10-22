@@ -49,7 +49,7 @@ func main() {
 	osservices := osservices.NewOSServicesProvider()
 
 	// 2 - boiler DONE
-	sonoffr3rfRelayDrv := sonoffr3rf.New(osservices, "24:a1:60:1d:72:9d")
+	sonoffr3rfRelayDrv := sonoffr3rf.New(osservices, "24:a1:60:1d:72:9d", "10012ff7ab")
 	boilerRelayDrv := asyncdecorator.New(sonoffr3rfRelayDrv, 10*time.Minute)
 	boilerController := simplerelay.New(boilerRelayDrv)
 

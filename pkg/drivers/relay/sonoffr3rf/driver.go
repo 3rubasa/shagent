@@ -12,14 +12,16 @@ import (
 )
 
 type Driver struct {
-	osSvcs  OSServicesProvider
-	macAddr string
+	osSvcs   OSServicesProvider
+	macAddr  string
+	deviceId string
 }
 
-func New(osSvcs OSServicesProvider, macAddr string) *Driver {
+func New(osSvcs OSServicesProvider, macAddr string, deviceId string) *Driver {
 	return &Driver{
-		osSvcs:  osSvcs,
-		macAddr: macAddr,
+		osSvcs:   osSvcs,
+		macAddr:  macAddr,
+		deviceId: deviceId,
 	}
 }
 
@@ -34,7 +36,9 @@ func (d Driver) GetState() (string, error) {
 	}
 
 	url := fmt.Sprintf("http://%s:%d/%s", ip, relayPort, relayInfoPath)
-	reqBody := strings.NewReader(relayInfoBody)
+
+	body := fmt.Sprintf(relayInfoBodyTmpl, d.deviceId)
+	reqBody := strings.NewReader(body)
 
 	log.Println("Debug: About to send http request to relay: ", url)
 	// Enforce delay - switch can process one request per 200 ms
@@ -93,7 +97,8 @@ func (d Driver) TurnOn() error {
 
 	url := fmt.Sprintf("http://%s:%d/%s", ip, relayPort, relaySwitchPath)
 
-	reqBody := strings.NewReader(relaySwitchOnBody)
+	body := fmt.Sprintf(relaySwitchOnBodyTmpl, d.deviceId)
+	reqBody := strings.NewReader(body)
 
 	log.Println("Debug: About to send http request to relay: ", url)
 	// Enforce delay - switch can process one request per 200 ms
@@ -146,7 +151,8 @@ func (d Driver) TurnOff() error {
 
 	url := fmt.Sprintf("http://%s:%d/%s", ip, relayPort, relaySwitchPath)
 
-	reqBody := strings.NewReader(relaySwitchOffBody)
+	body := fmt.Sprintf(relaySwitchOffBodyTmpl, d.deviceId)
+	reqBody := strings.NewReader(body)
 
 	log.Println("Debug: About to send http request to relay: ", url)
 	// Enforce delay - switch can process one request per 200 ms
