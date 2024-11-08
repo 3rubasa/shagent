@@ -7,33 +7,34 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/3rubasa/osservices"
 )
 
 type Driver struct {
-	osSvcs   OSServicesProvider
-	macAddr  string
-	deviceId string
+	osSvcs    OSServicesProvider
+	macAddr   string
+	deviceId  string
+	ipAddress string
 }
 
-func New(osSvcs OSServicesProvider, macAddr string, deviceId string) *Driver {
+func New(osSvcs OSServicesProvider, macAddr string, deviceId string, ipAddress string) *Driver {
 	return &Driver{
-		osSvcs:   osSvcs,
-		macAddr:  macAddr,
-		deviceId: deviceId,
+		osSvcs:    osSvcs,
+		macAddr:   macAddr,
+		deviceId:  deviceId,
+		ipAddress: ipAddress,
 	}
 }
 
 func (d Driver) GetState() (string, error) {
-	ip, err := d.osSvcs.GetIPFromMAC(d.macAddr)
-	if err == osservices.ErrNotFound {
-		log.Println("NOTICE: relay ", d.macAddr, " not available")
-		return "", ErrNotAvailable
-	} else if err != nil {
-		log.Println("ERROR: Failed to get relay state: ", err)
-		return "", fmt.Errorf("failed to get relay IP address: %v", err)
-	}
+	ip := d.ipAddress
+	// ip, err := d.osSvcs.GetIPFromMAC(d.macAddr)
+	// if err == osservices.ErrNotFound {
+	// 	log.Println("NOTICE: relay ", d.macAddr, " not available")
+	// 	return "", ErrNotAvailable
+	// } else if err != nil {
+	// 	log.Println("ERROR: Failed to get relay state: ", err)
+	// 	return "", fmt.Errorf("failed to get relay IP address: %v", err)
+	// }
 
 	url := fmt.Sprintf("http://%s:%d/%s", ip, relayPort, relayInfoPath)
 
@@ -86,14 +87,16 @@ func (d Driver) GetState() (string, error) {
 }
 
 func (d Driver) TurnOn() error {
-	ip, err := d.osSvcs.GetIPFromMAC(d.macAddr)
-	if err == osservices.ErrNotFound {
-		log.Println("NOTICE: relay ", d.macAddr, " not available")
-		return ErrNotAvailable
-	} else if err != nil {
-		log.Println("ERROR: Failed TURN ON the relay: ", err)
-		return fmt.Errorf("failed to get relay IP address: %v", err)
-	}
+	ip := d.ipAddress
+
+	// ip, err := d.osSvcs.GetIPFromMAC(d.macAddr)
+	// if err == osservices.ErrNotFound {
+	// 	log.Println("NOTICE: relay ", d.macAddr, " not available")
+	// 	return ErrNotAvailable
+	// } else if err != nil {
+	// 	log.Println("ERROR: Failed TURN ON the relay: ", err)
+	// 	return fmt.Errorf("failed to get relay IP address: %v", err)
+	// }
 
 	url := fmt.Sprintf("http://%s:%d/%s", ip, relayPort, relaySwitchPath)
 
@@ -140,14 +143,16 @@ func (d Driver) TurnOn() error {
 }
 
 func (d Driver) TurnOff() error {
-	ip, err := d.osSvcs.GetIPFromMAC(d.macAddr)
-	if err == osservices.ErrNotFound {
-		log.Println("NOTICE: relay ", d.macAddr, " not available")
-		return ErrNotAvailable
-	} else if err != nil {
-		log.Println("ERROR: Failed to get the relay IP address: ", err)
-		return fmt.Errorf("failed to get relay IP address: %v", err)
-	}
+	ip := d.ipAddress
+
+	// ip, err := d.osSvcs.GetIPFromMAC(d.macAddr)
+	// if err == osservices.ErrNotFound {
+	// 	log.Println("NOTICE: relay ", d.macAddr, " not available")
+	// 	return ErrNotAvailable
+	// } else if err != nil {
+	// 	log.Println("ERROR: Failed to get the relay IP address: ", err)
+	// 	return fmt.Errorf("failed to get relay IP address: %v", err)
+	// }
 
 	url := fmt.Sprintf("http://%s:%d/%s", ip, relayPort, relaySwitchPath)
 

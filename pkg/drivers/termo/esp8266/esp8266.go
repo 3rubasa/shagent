@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const connType = "tcp"
+const connType = "tcp4"
 const bufSize = 1024
 const smallBufSize = 256
 

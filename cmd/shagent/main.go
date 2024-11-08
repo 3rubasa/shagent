@@ -49,13 +49,13 @@ func main() {
 	osservices := osservices.NewOSServicesProvider()
 
 	// 2 - boiler DONE
-	sonoffr3rfRelayDrv := sonoffr3rf.New(osservices, "24:a1:60:1d:72:9d", "10012ff7ab")
+	sonoffr3rfRelayDrv := sonoffr3rf.New(osservices, "24:a1:60:1d:72:9d", "10012ff7ab", "10.0.0.17")
 	boilerRelayDrv := asyncdecorator.New(sonoffr3rfRelayDrv, 10*time.Minute)
 	boilerController := simplerelay.New(boilerRelayDrv)
 
 	// 3 - roomLight DONE
 	// TODO: Later, if roomLight is nil, what are we going to do?
-	roomLightRelayDrv, err := wsraspihatx3.New(wsraspihatx3.RelayChannel1)
+	roomLightRelayDrv, err := wsraspihatx3.New(wsraspihatx3.RelayChannel2)
 	if err != nil {
 		log.Println("ERROR: Failed to create WaveShare Raspi Hat relay device: ", err)
 	}
@@ -68,7 +68,7 @@ func main() {
 
 	// 4 - camLight DONE
 	// TODO: Later, if cam light is nil, what are we going to do?
-	camLightRelayDrv, err := wsraspihatx3.New(wsraspihatx3.RelayChannel2)
+	camLightRelayDrv, err := wsraspihatx3.New(wsraspihatx3.RelayChannel3)
 	if err != nil {
 		fmt.Println("ERROR: Failed to create WaveShare Raspi Hat relay device: ", err)
 	}
