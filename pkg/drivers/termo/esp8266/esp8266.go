@@ -38,6 +38,8 @@ func New(port int, cacheTTL time.Duration) *Sensor {
 func (s *Sensor) handleRequest(conn net.Conn) {
 	defer conn.Close()
 
+	log.Println("DEBUG: ESP8266 termo sensor: NEW REQUEST FROM ESP 8255 ")
+
 	var err error
 
 	now := time.Now()
@@ -51,8 +53,8 @@ func (s *Sensor) handleRequest(conn net.Conn) {
 	for {
 		n, err := conn.Read(b)
 		if err != nil && err != io.EOF && !os.IsTimeout(err) {
-			log.Println("ERROR: ESP8266 termo sensor: failed to read from socket: ", err)
-			return
+			log.Println("ERROR: ESP8266 termo sensor: failed to read from socket, but we will try to unmarshall what has been read so far: ", err)
+			break
 		}
 
 		bytesRead += n
@@ -61,12 +63,16 @@ func (s *Sensor) handleRequest(conn net.Conn) {
 			return
 		}
 
+		log.Println("DEBUG: ESP8266 :Reading from socket, read bytes: ", bytesRead)
+
 		buf = append(buf, b[0:n]...)
 
 		if err == io.EOF || os.IsTimeout(err) {
 			break
 		}
 	}
+
+	log.Println("DEBUG: ESP8266 :Finished reading from socket")
 
 	var data SensorData
 
@@ -80,6 +86,8 @@ func (s *Sensor) handleRequest(conn net.Conn) {
 		log.Println("ERROR: ESP8266 termo sensor: temperature value is invalid: ", data.Temp)
 		return
 	}
+
+	log.Println("DEBUG: ESP8266 termo sensor: UNMARSHALLED TEMP: ", data.Temp)
 
 	s.mux.Lock()
 	s.t = data.Temp
@@ -127,6 +135,8 @@ func (s *Sensor) Get() (float64, error) {
 	t := s.t
 	tempTS := s.tempTS
 	s.mux.Unlock()
+
+	log.Println("Dbg: ESP8266 termo driver: GET called: t =  ", t, " and tempTS = ", tempTS, "and time since TS: ", time.Since(tempTS))
 
 	if time.Since(tempTS) > s.cacheTTL {
 		return -100, ErrNoFreshData

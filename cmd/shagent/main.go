@@ -91,8 +91,17 @@ func main() {
 	outdoorsTempSensorDrv := dht22.New(23)
 	outdoorsTempController := temperature.New(outdoorsTempSensorDrv, 10*time.Minute, time.Minute)
 
-	pantryTempSensorDrv := esp8266.New(3333, 30*time.Minute)
-	pantryTempController := temperature.New(pantryTempSensorDrv, 30*time.Minute, 10*time.Minute)
+	pantryTempSensorDrv := esp8266.New(3333, 10*time.Minute)
+	pantryTempController := temperature.New(pantryTempSensorDrv, 10*time.Minute, 1*time.Minute)
+
+	bathroomTempSensorDrv := esp8266.New(3334, 10*time.Minute)
+	bathroomTempController := temperature.New(bathroomTempSensorDrv, 10*time.Minute, 1*time.Minute)
+
+	bedroomTempSensorDrv := esp8266.New(3335, 10*time.Minute)
+	bedoomTempController := temperature.New(bedroomTempSensorDrv, 10*time.Minute, 1*time.Minute)
+
+	livingroomTempSensorDrv := esp8266.New(3336, 10*time.Minute)
+	livingroomTempController := temperature.New(livingroomTempSensorDrv, 10*time.Minute, 1*time.Minute)
 
 	// 6.4 - Weather Temperature
 	weatherTempProvider := weatherprovider.New(&cfg.WeatherProvider, "5e9e1159073f45d7a7063db8891c82b0", "stebnyk", "ua", time.Minute, 45*time.Minute, 95*time.Minute)
@@ -107,17 +116,20 @@ func main() {
 	lteController := ltemodulecontroller.New(lteDrv)
 
 	blComponents := &businesslogic.BusinessLogicComponents{
-		RoomLight:    roomLightController,
-		CamLight:     camLightController,
-		KitchenTemp:  kitchenTempController,
-		WindowTemp:   windowTempController,
-		ForecastTemp: forecastTempProvider,
-		OutdoorsTemp: outdoorsTempController,
-		PantryTemp:   pantryTempController,
-		WeatherTemp:  weatherTempProvider,
-		Power:        powerController,
-		Boiler:       boilerController,
-		LTEModule:    lteController,
+		RoomLight:      roomLightController,
+		CamLight:       camLightController,
+		KitchenTemp:    kitchenTempController,
+		WindowTemp:     windowTempController,
+		ForecastTemp:   forecastTempProvider,
+		OutdoorsTemp:   outdoorsTempController,
+		PantryTemp:     pantryTempController,
+		BathroomTemp:   bathroomTempController,
+		BedroomTemp:    bedoomTempController,
+		LivingroomTemp: livingroomTempController,
+		WeatherTemp:    weatherTempProvider,
+		Power:          powerController,
+		Boiler:         boilerController,
+		LTEModule:      lteController,
 	}
 
 	tempControlTable := map[businesslogic.ForecestTempRange]map[businesslogic.WeatherTempRange]businesslogic.RoomTempRange{
@@ -164,7 +176,7 @@ func main() {
 	processor := businesslogic.NewProcessor(businessRules, blComponents)
 
 	// 8 - Business logic
-	bl := businesslogic.New(&cfg.BusinessLogic, blComponents, processor, 5*time.Minute, 2*time.Minute, 5*time.Minute)
+	bl := businesslogic.New(&cfg.BusinessLogic, blComponents, processor, 1*time.Minute, 2*time.Minute, 5*time.Minute)
 	bl.Start()
 
 	// 9 - webserver

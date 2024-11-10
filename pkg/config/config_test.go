@@ -12,6 +12,7 @@ var input string = `{
         "consumer":{
             "enabled": true,
             "api_keys":"consumer_key",
+			"api_keys_temperature":"consumer_key_temperature",
             "address":"api.thingspeak.com",
             "schema":"https",
             "uri":"update"
@@ -42,6 +43,7 @@ func TestConfig(t *testing.T) {
 
 	assert.Equal(t, cfg.BusinessLogic.Consumer.Enabled, true)
 	assert.Equal(t, cfg.BusinessLogic.Consumer.APIKeys, "consumer_key")
+	assert.Equal(t, cfg.BusinessLogic.Consumer.APIKeysTemperature, "consumer_key_temperature")
 	assert.Equal(t, cfg.BusinessLogic.Consumer.Address, "api.thingspeak.com")
 	assert.Equal(t, cfg.BusinessLogic.Consumer.Schema, "https")
 	assert.Equal(t, cfg.BusinessLogic.Consumer.URI, "update")

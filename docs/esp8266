@@ -2,8 +2,12 @@
 2. GPIO0 decides normal boot/flash mode. High (default) is normal boot, so nothin need to be done for normal boot. For flash mode - pull-down the pin to GND with 10K resistor
 3. GPIO15 must be Pulled-Down to GND with 10K resistor (adapter already does this)
 4. CH_PD must be Pulled-UP to VCC with 10K resistor (adapter already does this)
-5. GPIO16 must be connected to RST with 470R (or 1K) to enable wake-up from deep sleep
+5. GPIO16 must be connected to RST with 330 Ohm to enable wake-up from deep sleep
 
+For flashing use USB programmer with logo 'BAITE' on it and betemcu.cn printed on it
+ - Set voltage to 3.3 on programmer (a switch)
+ - connect to ESP8266: RXD->TXD, TXD->RXD, GND->GND.
+ - power source for ESP8266 can be external (~ 3.3 volts), but make sure that GND is common with programmer
 
 Voltage measurements
 

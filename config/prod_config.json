@@ -3,6 +3,7 @@
         "consumer":{
             "enabled": true,
             "api_keys":"TL9W7QIEFKFIYIS7",
+            "api_keys_temperature":"ZCMC2WE6HK0UCX81",
             "address":"api.thingspeak.com",
             "schema":"https",
             "uri":"update"

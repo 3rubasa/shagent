@@ -1,17 +1,20 @@
 package businesslogic
 
 type BusinessLogicComponents struct {
-	RoomLight    RoomLightController
-	CamLight     RoomLightController
-	KitchenTemp  TempSensorController
-	WindowTemp   TempSensorController
-	OutdoorsTemp TempSensorController
-	PantryTemp   TempSensorController
-	WeatherTemp  TempSensorController
-	ForecastTemp TempForecastController
-	Power        PowerSensorController
-	Boiler       BoilerController
-	LTEModule    LTEModuleController
+	RoomLight      RoomLightController
+	CamLight       RoomLightController
+	KitchenTemp    TempSensorController
+	WindowTemp     TempSensorController
+	OutdoorsTemp   TempSensorController
+	PantryTemp     TempSensorController
+	BathroomTemp   TempSensorController
+	BedroomTemp    TempSensorController
+	LivingroomTemp TempSensorController
+	WeatherTemp    TempSensorController
+	ForecastTemp   TempForecastController
+	Power          PowerSensorController
+	Boiler         BoilerController
+	LTEModule      LTEModuleController
 }
 
 type State struct {
@@ -27,6 +30,12 @@ type State struct {
 	OutdoorsTempValid   bool
 	PantryTemp          float64
 	PantryTempValid     bool
+	BathroomTemp        float64
+	BathroomTempValid   bool
+	BedroomTemp         float64
+	BedroomTempValid    bool
+	LivingroomTemp      float64
+	LivingroomTempValid bool
 	WeatherTemp         float64
 	WeatherTempValid    bool
 	ForecastedTemp      float64

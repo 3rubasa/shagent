@@ -62,6 +62,21 @@ func (b *BusinessLogic) Start() error {
 		fmt.Println("Failed to start pantry temperature sensor controller: ", err)
 	}
 
+	err = b.c.BathroomTemp.Start()
+	if err != nil {
+		fmt.Println("Failed to start bathroom temperature sensor controller: ", err)
+	}
+
+	err = b.c.BedroomTemp.Start()
+	if err != nil {
+		fmt.Println("Failed to start bedroom temperature sensor controller: ", err)
+	}
+
+	err = b.c.LivingroomTemp.Start()
+	if err != nil {
+		fmt.Println("Failed to start living room temperature sensor controller: ", err)
+	}
+
 	err = b.c.WeatherTemp.Start()
 	if err != nil {
 		fmt.Println("Failed to start weather temperature sensor controller: ", err)
@@ -122,6 +137,7 @@ func (b *BusinessLogic) mainLoop() error {
 			b.pollSensors()
 		case <-b.sendingTicker.C:
 			b.sendState()
+			b.sendTemperatureState()
 		case <-b.processingTicker.C:
 			b.processState()
 		case <-b.done:
@@ -168,6 +184,30 @@ func (b *BusinessLogic) pollSensors() {
 	} else {
 		s.PantryTemp = t
 		s.PantryTempValid = true
+	}
+
+	t, err = b.c.BathroomTemp.Get()
+	if err != nil {
+		log.Println("NOTICE: Could not get bathroom temperature: ", err)
+	} else {
+		s.BathroomTemp = t
+		s.BathroomTempValid = true
+	}
+
+	t, err = b.c.BedroomTemp.Get()
+	if err != nil {
+		log.Println("NOTICE: Could not get bedroom temperature: ", err)
+	} else {
+		s.BedroomTemp = t
+		s.BedroomTempValid = true
+	}
+
+	t, err = b.c.LivingroomTemp.Get()
+	if err != nil {
+		log.Println("NOTICE: Could not get livingroom temperature: ", err)
+	} else {
+		s.LivingroomTemp = t
+		s.LivingroomTempValid = true
 	}
 
 	t, err = b.c.WeatherTemp.Get()
@@ -250,6 +290,70 @@ func (b *BusinessLogic) sendState() {
 	}
 	if s.RoomLightStateValid {
 		url += "&field8=" + urltools.QueryEscape(fmt.Sprintf("%d", s.RoomLightState))
+	}
+
+	fmt.Printf("About to send request: %s \n", url)
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		fmt.Printf("Error while creating request: %s \n", err.Error())
+		return
+	}
+
+	client := http.Client{
+		Timeout: 30 * time.Second,
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("Error while sending request: %s \n", err.Error())
+		return
+	}
+
+	if resp.StatusCode != 200 {
+		err = fmt.Errorf("response status is not 200: %d", resp.StatusCode)
+		fmt.Printf("Error: %s \n", err.Error())
+		return
+	}
+}
+
+func (b *BusinessLogic) sendTemperatureState() {
+	fmt.Println("+ SendTemperatureState started")
+	defer fmt.Println("+ sendTemperatureState exited")
+
+	var s State
+	b.stateMux.Lock()
+	s = b.state
+	b.stateMux.Unlock()
+
+	url := fmt.Sprintf("%s://%s/%s?api_key=%s", b.cfg.Consumer.Schema, b.cfg.Consumer.Address, b.cfg.Consumer.URI, b.cfg.Consumer.APIKeysTemperature)
+
+	if s.WeatherTempValid {
+		url += "&field1=" + urltools.QueryEscape(fmt.Sprintf("%f", s.WeatherTemp))
+	}
+
+	if s.WindowTempValid {
+		url += "&field2=" + urltools.QueryEscape(fmt.Sprintf("%f", s.WindowTemp))
+	}
+
+	if s.KitchenTempValid {
+		url += "&field3=" + urltools.QueryEscape(fmt.Sprintf("%f", s.KitchenTemp))
+	}
+
+	if s.BathroomTempValid {
+		url += "&field4=" + urltools.QueryEscape(fmt.Sprintf("%f", s.BathroomTemp))
+	}
+
+	if s.PantryTempValid {
+		url += "&field5=" + urltools.QueryEscape(fmt.Sprintf("%f", s.PantryTemp))
+	}
+
+	if s.BedroomTempValid {
+		url += "&field6=" + urltools.QueryEscape(fmt.Sprintf("%f", s.BedroomTemp))
+	}
+
+	if s.LivingroomTempValid {
+		url += "&field7=" + urltools.QueryEscape(fmt.Sprintf("%f", s.LivingroomTemp))
 	}
 
 	fmt.Printf("About to send request: %s \n", url)

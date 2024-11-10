@@ -43,11 +43,12 @@ type BusinessLogicConfig struct {
 }
 
 type ConsumerConfig struct {
-	Enabled bool   `json:"enabled"`
-	APIKeys string `json:"api_keys"`
-	Address string `json:"address"`
-	Schema  string `json:"schema"`
-	URI     string `json:"uri"`
+	Enabled            bool   `json:"enabled"`
+	APIKeys            string `json:"api_keys"`
+	APIKeysTemperature string `json:"api_keys_temperature"`
+	Address            string `json:"address"`
+	Schema             string `json:"schema"`
+	URI                string `json:"uri"`
 }
 
 type WeatherProviderConfig struct {
